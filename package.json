@@ -1,7 +1,7 @@
 {
-  "name": "react-cli",
+  "name": "huigou-admin",
   "version": "1.0.0",
-  "description": "公用的react脚手架",
+  "description": "会购商城后台管理系统",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=dev webpack-dev-server --progress  --inline --hot --compress --history-api-fallback --config webpack/dev.config.js",
@@ -9,18 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jack-team/react-cli.git"
+    "url": "git+https://github.com/jack-team/huigou-admin.git"
   },
   "keywords": [
+    "会购",
     "react",
     "webpack"
   ],
   "author": "jacker",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jack-team/react-cli/issues"
+    "url": "https://github.com/jack-team/huigou-admin/issues"
   },
-  "homepage": "https://github.com/jack-team/react-cli#readme",
+  "homepage": "https://github.com/jack-team/huigou-admin#readme",
   "devDependencies": {
     "assets-webpack-plugin": "^3.5.1",
     "autoprefixer": "^7.1.1",
