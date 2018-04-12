@@ -1,20 +1,17 @@
-import React ,{ PureComponent } from 'react';
+import React from 'react';
+import mirror, {render, Router} from 'mirrorx';
 
-import ReactDom from 'react-dom';
+mirror.defaults({
+    historyMode: 'hash'
+});
 
-import styles from './style.scss';
+import routes from './router';
 
-
-class App extends PureComponent {
-    render(){
-        return (
-            <div className={styles.wrapper}>this is my app</div>
-        )
-    }
-}
-
-
-ReactDom.render(
-    <App /> ,
-    document.getElementById("root")
+const App = () => (
+    <Router>
+        {routes}
+    </Router>
 );
+
+
+render(<App/>, document.getElementById(`root`));

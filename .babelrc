@@ -1,7 +1,8 @@
 {
-  "presets": ["env", "react"],
+  "presets": ["env", "react","stage-0"],
   "plugins": [
-    "transform-runtime"
+    "transform-runtime",
+    ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
   ],
   "comments": false
 }
