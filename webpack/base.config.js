@@ -7,6 +7,7 @@ const webpack = require('webpack');
 const process = require('process');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const resolve = folder => path.resolve(__dirname, `../${folder}`);
 
 const __DEV__ = process.env.NODE_ENV === 'dev';
 
@@ -33,21 +34,34 @@ const baseConfig = {
     module: {
         rules: [
             {
-                test: /\.vue$/,
-                use: 'vue-loader',
-                exclude: path => !!path.match(/node_modules/)
-            },
-            {
                 test: /\.js?$/,
                 use: 'babel-loader',
                 exclude: path => !!path.match(/node_modules/)
             },
             {
                 test: /\.(css|scss|less)$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'postcss-loader', 'sass-loader', 'less-loader']
-                })
+                include: resolve(`src`),
+                exclude: resolve(`node_modules`),
+                use: [__DEV__ ? `css-hot-loader` : ``].concat([
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            camelCase: true,
+                            localIdentName: `${__DEV__?`[local]-`:``}[hash:base64:16]`
+                        }
+                    },
+                    'postcss-loader',
+                    'sass-loader',
+                    'less-loader'
+                ])
+            },
+            {
+                test: /\.(css|scss|less)$/,
+                include: resolve(`node_modules`),
+                exclude: resolve(`src`),
+                use: [ 'style-loader', 'css-loader', 'postcss-loader', 'sass-loader', 'less-loader']
             },
             {
                 test: /\.(png|jpg|svg|gif)$/,
@@ -80,10 +94,10 @@ const baseConfig = {
         }),
 
         //提取css,将它放在css文件夹下
-        new ExtractTextPlugin({
-            allChunks: true,
-            filename: `css/[name]${Hash8}.css`
-        }),
+        // new ExtractTextPlugin({
+        //     allChunks: true,
+        //     filename: `css/[name]${Hash8}.css`
+        // }),
 
         //模板
         new HtmlWebpackPlugin({
