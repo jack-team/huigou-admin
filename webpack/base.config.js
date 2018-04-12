@@ -49,14 +49,14 @@ const baseConfig = {
                 exclude: resolve(`node_modules`),
                 use: (__DEV__ ? [`css-hot-loader`] : []).concat([
                     'style-loader',
-                    {
+                     {
                         loader: 'css-loader',
                         options: {
                             modules: true,
                             camelCase: true,
                             localIdentName: `${__DEV__ ? `[local]-` : ``}[hash:base64:16]`
                         }
-                    },
+                     },
                     'postcss-loader',
                     'sass-loader',
                     'less-loader'
@@ -72,7 +72,13 @@ const baseConfig = {
                         'css-loader',
                         'postcss-loader',
                         'sass-loader',
-                        `less-loader?{"sourceMap":true,"modifyVars":${JSON.stringify(antTheme)}}`
+                         {
+                            loader:'less-loader',
+                            options:{
+                                sourceMap:true,
+                                modifyVars:antTheme
+                            }
+                         }
                     ]
                 })
             },
