@@ -1,10 +1,10 @@
-import React, {PureComponent, PropTypes} from 'react';
-
+import React, { PureComponent } from 'react';
 
 const Loading = props => (
-    <div>11111</div>
+    <div>loading...</div>
 );
 
+//高阶组件
 export default Promise => (
     class LoadComponent extends PureComponent {
 
@@ -15,25 +15,27 @@ export default Promise => (
         };
 
         componentWillMount() {
-            this.loadComp();
+            this.load();
         }
 
-        loadComp() {
-            this.Promise().then(comp => {
-                return comp.default ? comp.default : comp;
-            }).then(comp => (
-                this.setState({
-                    Component: comp
+        load() {
+            this.Promise()
+                .then(comp => {
+                    return comp.default ? comp.default : comp;
                 })
-            ));
+                .then(comp => (
+                    this.setState({
+                        Component: comp
+                    })
+                ));
         }
 
         render() {
-            const {Component} = this.state;
-            return <Component/>;
+            const { Component } = this.state;
+            return <Component {...this.props}/>;
         }
     }
-);
+)
 
 
 

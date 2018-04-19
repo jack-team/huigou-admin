@@ -2,23 +2,28 @@ import React from 'react';
 
 import {
     Route,
-    Switch,
-    Router,
-    Redirect
-} from 'mirrorx';
+    Switch
+} from 'react-router-dom';
 
 import LazyLoad from './../components/LazyLoad';
 
+import Auth from './../components/Auth';
 
-const Home = LazyLoad(()=>import('./../views/home.js'));
+const Login = LazyLoad(() => import('./../views/login.js'));
 
+const Home = LazyLoad(() => import('./../views/home.js'));
 
 export default (
     <Switch>
         <Route
             path="/"
-            component={Home}
+            component={Auth(Home)}
+            exact
+        />
+        <Route
+            path="/login"
+            component={Auth(Login, false)}
             exact
         />
     </Switch>
-)
+);

@@ -6,7 +6,7 @@ const path = require('path');
 const webpack = require('webpack');
 const process = require('process');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const resolve = folder => path.resolve(__dirname, `../${folder}`);
 
@@ -15,7 +15,7 @@ const __DEV__ = process.env.NODE_ENV === 'dev';
 const Hash8 = !__DEV__ ? '-[hash:8]' : '';
 
 const antTheme = {
-    "primary-color": "#1DA57A",
+    'primary-color': '#1DA57A',
 };
 
 //基本配置
@@ -32,7 +32,7 @@ const baseConfig = {
     // 输出
     output: {
         path: path.resolve(__dirname, '../dist'),
-        publicPath: "",
+        publicPath: '',
         filename: `js/[name]${Hash8}.js`
     },
     // 加载器
@@ -40,7 +40,7 @@ const baseConfig = {
         rules: [
             {
                 test: /\.js?$/,
-                use: 'babel-loader',
+                use: [`babel-loader`, `eslint-loader`],
                 exclude: path => !!path.match(/node_modules/)
             },
             {
@@ -48,18 +48,18 @@ const baseConfig = {
                 include: resolve(`src`),
                 exclude: resolve(`node_modules`),
                 use: (__DEV__ ? [`css-hot-loader`] : []).concat([
-                    'style-loader',
-                     {
-                        loader: 'css-loader',
+                    `style-loader`,
+                    {
+                        loader: `css-loader`,
                         options: {
                             modules: true,
                             camelCase: true,
                             localIdentName: `${__DEV__ ? `[local]-` : ``}[hash:base64:16]`
                         }
-                     },
-                    'postcss-loader',
-                    'sass-loader',
-                    'less-loader'
+                    },
+                    `postcss-loader`,
+                    `sass-loader`,
+                    `less-loader`
                 ])
             },
             {
@@ -69,16 +69,16 @@ const baseConfig = {
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
-                        'css-loader',
-                        'postcss-loader',
-                        'sass-loader',
-                         {
-                            loader:'less-loader',
-                            options:{
-                                sourceMap:true,
-                                modifyVars:antTheme
+                        `css-loader`,
+                        `postcss-loader`,
+                        `sass-loader`,
+                        {
+                            loader: `less-loader`,
+                            options: {
+                                sourceMap: true,
+                                modifyVars: antTheme
                             }
-                         }
+                        }
                     ]
                 })
             },
@@ -101,7 +101,7 @@ const baseConfig = {
         ],
     },
     resolve: {
-        extensions: ['.js', '.scss', '.less']
+        extensions: ['.js', '.scss']
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin({
@@ -117,7 +117,7 @@ const baseConfig = {
 
         //模板
         new HtmlWebpackPlugin({
-            title: "",
+            title: '',
             filename: 'app.html',
             template: 'tpl.html',
             chunks: ['common', 'app'],

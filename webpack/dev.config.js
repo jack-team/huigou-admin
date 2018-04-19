@@ -16,7 +16,7 @@ const devServer = {
     //热更新
     hot: true,
     // 服务器地址
-    host: util.getIPAddress(),
+    host: `localhost` || util.getIPAddress(),
     //inline模式下我们访问的URL不用发生变化
     inline: true,
     // 端口号
