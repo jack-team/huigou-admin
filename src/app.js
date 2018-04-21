@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 
 import { message } from 'antd';
 
+import './common/common';
 
 import store from './state/store';
 

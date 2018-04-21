@@ -15,7 +15,7 @@ const __DEV__ = process.env.NODE_ENV === 'dev';
 const Hash8 = !__DEV__ ? '-[hash:8]' : '';
 
 const antTheme = {
-    'primary-color': '#1DA57A',
+    'primary-color': '#00c1de',
 };
 
 //基本配置

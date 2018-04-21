@@ -2,23 +2,26 @@ import React from 'react';
 
 import {
     Route,
-    Switch
+    Switch,
+    Redirect
 } from 'react-router-dom';
 
-import LazyLoad from './../components/LazyLoad';
-
+import HomeRouter from './home';
+import Login from './../views/login';
 import Auth from './../components/Auth';
-
-const Login = LazyLoad(() => import('./../views/login.js'));
-
-const Home = LazyLoad(() => import('./../views/home.js'));
 
 export default (
     <Switch>
         <Route
             path="/"
-            component={Auth(Home)}
+            render={() => (
+                <Redirect to="/home"/>
+            )}
             exact
+        />
+        <Route
+            path="/home"
+            component={Auth(HomeRouter)}
         />
         <Route
             path="/login"

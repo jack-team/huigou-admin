@@ -7,7 +7,6 @@ let initState = {
 
 export default (state = initState, action) => {
     const { type, data } = action;
-
     switch (type) {
         case types.SIGN_IN:
             return {
@@ -21,7 +20,6 @@ export default (state = initState, action) => {
                 isLogin:false
             }
     }
-
 
     return state;
 }

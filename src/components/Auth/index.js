@@ -7,36 +7,24 @@ import { connect } from 'react-redux';
 export default (Component, isAuth = true) => {
     class Auth extends PureComponent {
 
-        constructor(props) {
-            super();
-        }
-
         to() {
             const { isLogin } = this.props.user;
 
-            if (isLogin && !isAuth) {
-                return (
-                    <Redirect to="/"/>
-                );
-            }
+            if (isLogin && !isAuth) return (
+                <Redirect to="/" />
+            );
 
-            if (!isLogin && isAuth) {
-                return (
-                    <Redirect to="/login"/>
-                );
-            }
+            if (!isLogin && isAuth) return (
+                <Redirect to="/login" />
+            );
 
-            if (isLogin && isAuth) {
-                return (
-                    <Component {...this.props} />
-                );
-            }
+            if (isLogin && isAuth) return (
+                <Component {...this.props} />
+            );
 
-            if (!isLogin && !isAuth) {
-                return (
-                    <Component {...this.props} />
-                );
-            }
+            if (!isLogin && !isAuth) return (
+                <Component {...this.props} />
+            );
         }
 
         render() {

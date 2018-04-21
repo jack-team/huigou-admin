@@ -10,6 +10,8 @@ export default Promise => (
 
         Promise = Promise;
 
+        life = true;
+
         state = {
             Component: Loading
         };
@@ -18,16 +20,22 @@ export default Promise => (
             this.load();
         }
 
+        componentWillUnmount() {
+            this.life = false;
+        }
+
         load() {
             this.Promise()
                 .then(comp => {
                     return comp.default ? comp.default : comp;
                 })
-                .then(comp => (
-                    this.setState({
-                        Component: comp
-                    })
-                ));
+                .then(comp => {
+                    if (this.life) {
+                        this.setState({
+                            Component: comp
+                        });
+                    }
+                });
         }
 
         render() {
