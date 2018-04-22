@@ -33,6 +33,11 @@ class Login extends PureComponent {
 
         const { history } = this.props;
 
+        // $http.post(`/user/signUp`,{
+        //     username:userName,
+        //     password:password
+        // });
+
         if (!userName) {
             return message.error(`用户名不能为空！`);
         }
@@ -46,13 +51,16 @@ class Login extends PureComponent {
         });
 
         userActions.signIn(userName, password)
-            .then(cb => {
+            .then((cb = () => {
+            }) => {
+                setTimeout(() => cb(), 800);
+            })
+            .finally(() => {
                 setTimeout(() => {
                     this.setState({
                         loading: false
                     });
-                    cb();
-                }, 1000);
+                }, 750);
             });
     }
 

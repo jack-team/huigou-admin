@@ -1,0 +1,44 @@
+.form_box {
+    width: 500px;
+    padding: 20px 50px 1px 50px;
+    background: #fff;
+    margin: 50px auto;
+    border-radius: 4px;
+    .from_item_base {
+        width: 100%;
+        :global {
+            .ant-form-explain {
+                margin-top: 2px;
+            }
+
+        }
+    }
+
+    :global {
+        .ant-form-item-with-help {
+            margin-bottom: 1px;
+        }
+    }
+
+    .review_image,.uploading {
+        width: 102px;
+        height: 102px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .uploading {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 28px;
+        color: #555;
+    }
+
+    .uploading_text {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+}

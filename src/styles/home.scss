@@ -83,16 +83,6 @@
     }
 }
 
-.com_trigger {
-    font-size: 14px;
-    color: #fff;
-    cursor: pointer;
-    text-align: center;
-    height: 36px;
-    line-height: 36px;
-    background: #4a5064;
-}
-
 .com_content {
     flex: 1;
     .center_content {
@@ -104,72 +94,24 @@
     }
 }
 
-.com_left_menu {
-    overflow-y: auto;
-    background: #333744;
-    height: 100%;
-}
-
-.menu_item {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    display: flex;
-    align-items: center;
-
-    &.menu_nav {
-        color: #fff !important;
-        font-size: 12px !important;
+:global {
+    .vertical-center-modal {
+        text-align: center;
+        white-space: nowrap;
     }
 
-    &.menu_nav_next {
-        color: #fff !important;
-        font-size: 12px !important;
+    .vertical-center-modal:before {
+        content: '';
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+        width: 0;
     }
-}
 
-.base_menu {
-    background: transparent;
-    :global {
-        .anticon {
-            font-size: 16px;
-        }
-        .ant-menu-item-active {
-            background: #00c1de !important;
-        }
-
-        .ant-menu-submenu-active {
-            .ant-menu-submenu-title {
-                background:#00c1de  !important;
-            }
-        }
-
-
-    }
-}
-
-.base_sub_menu {
-    :global {
-        .ant-menu-submenu-title {
-            font-size: 12px;
-            color: #fff;
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            display: flex;
-            align-items: center;
-        }
-
-        .ant-menu-item-active {
-            background: #383e52 !important;
-        }
-
-        .ant-menu-item-selected {
-            background: #00c1de !important;
-        }
-
-        .ant-menu-sub {
-            background: #262934 !important;
-            overflow: hidden;
-            box-shadow: none !important;
-        }
+    .vertical-center-modal .ant-modal {
+        display: inline-block;
+        vertical-align: middle;
+        top: 0;
+        text-align: left;
     }
 }

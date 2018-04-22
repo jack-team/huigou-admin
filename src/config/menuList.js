@@ -1,4 +1,4 @@
-const menuList = [
+export default [
     {
         name: '平台首页',
         icon: 'home',
@@ -12,11 +12,11 @@ const menuList = [
         children: [
             {
                 name: '商品分类',
-                path: '/home/mall/category'
+                path: '/category'
             },
             {
                 name: '商品分类',
-                path: '/home/mall/manage'
+                path: '/manage'
             }
         ]
     },
@@ -26,11 +26,9 @@ const menuList = [
         path: `/home/system`,
         children: [
             {
-                name: '修改密码',
-                path: '/home/system/info'
+                name: '用户信息',
+                path: '/info'
             }
         ]
     }
 ];
-
-export default menuList;

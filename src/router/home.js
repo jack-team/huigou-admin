@@ -15,12 +15,15 @@ const HomeIndex = LazyLoad(() => import('./../views/homeIndex.js'));
 //商品
 const goodsList = LazyLoad(() => import('./../views/goods/list.js'));
 
+//系统管理路由模块
+import systemRoutes from './system';
+
 const Routes = props => {
     const { path } = props.match;
     return (
         <Switch>
             <Route
-                name="首页"
+                desc="中转页面，重定向到home/index"
                 path={path}
                 render={() => (
                     <Redirect
@@ -30,22 +33,20 @@ const Routes = props => {
                 exact
             />
             <Route
-                name="系统管理"
+                desc="平台首页"
                 path={`${path}/index`}
                 component={HomeIndex}
                 exact
             />
             <Route
-                name="系统管理"
-                path={`${path}/system`}
-                component={HomeIndex}
-                exact
-            />
-            <Route
-                name="商品管理"
+                desc="商品管理"
                 path={`${path}/mall`}
                 component={goodsList}
-                exact
+            />
+            <Route
+                desc="系统管理"
+                path={`${path}/system`}
+                component={systemRoutes}
             />
         </Switch>
     );

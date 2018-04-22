@@ -15,12 +15,13 @@ const get = (url, para) => (
             return data;
         }
         return Promise.reject(data);
-    }).catch(() => (
-        Promise.reject({
+    }).catch(err => {
+        err = !err.code ? {
             code: 500,
             message: `服务异常，请稍后重试！`
-        })
-    ))
+        } : err;
+        return Promise.reject(err)
+    })
 );
 
 const post = (url, para) => (
@@ -29,12 +30,13 @@ const post = (url, para) => (
             return data;
         }
         return Promise.reject(data);
-    }).catch(() => (
-        Promise.reject({
+    }).catch(err => {
+        err = !err.code ? {
             code: 500,
             message: `服务异常，请稍后重试！`
-        })
-    ))
+        } : err;
+        return Promise.reject(err);
+    })
 );
 
 const upload = (para) => {

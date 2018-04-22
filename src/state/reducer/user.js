@@ -18,6 +18,11 @@ export default (state = initState, action) => {
         case types.SIGN_OUT:
             return {
                 isLogin:false
+            };
+        case types.UPDATE_USER:
+            return {
+                ...state,
+                ...data
             }
     }
 
