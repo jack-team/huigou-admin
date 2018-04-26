@@ -1,3 +1,4 @@
 export default  {
-    user:require('./user').default
+    user:require('./user').default,
+    mallCategory:require('./mall/category').default
 }

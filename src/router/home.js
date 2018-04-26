@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {
     Route,
     Switch,
@@ -8,12 +7,13 @@ import {
 
 import LazyLoad from '../components/LazyLoad';
 
-const Home = LazyLoad(() => import('./../views/home.js'));
+const BaseLayout = LazyLoad(() => import('../components/BaseLayout'));
 
-const HomeIndex = LazyLoad(() => import('./../views/homeIndex.js'));
+const Home = LazyLoad(() => import('../views/home.js'));
 
-//商品
-const goodsList = LazyLoad(() => import('./../views/goods/list.js'));
+
+//商城管理路由
+import mallRoutes from './mall';
 
 //系统管理路由模块
 import systemRoutes from './system';
@@ -35,13 +35,13 @@ const Routes = props => {
             <Route
                 desc="平台首页"
                 path={`${path}/index`}
-                component={HomeIndex}
+                component={Home}
                 exact
             />
             <Route
                 desc="商品管理"
                 path={`${path}/mall`}
-                component={goodsList}
+                component={mallRoutes}
             />
             <Route
                 desc="系统管理"
@@ -54,8 +54,8 @@ const Routes = props => {
 
 export default props => (
     <Route render={() => (
-        <Home {...props}>
+        <BaseLayout {...props}>
             <Routes {...props}/>
-        </Home>
+        </BaseLayout>
     )}/>
 )

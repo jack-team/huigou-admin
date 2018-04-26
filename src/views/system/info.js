@@ -1,17 +1,22 @@
 import React, { PureComponent, Fragment } from 'react';
-
 import connect from './../../common/connect';
-
 import styles from './info.scss';
 
-import { Form, Input, Button, Checkbox, Upload, Icon } from 'antd';
+import {
+    Form,
+    Input,
+    Button,
+    Upload,
+    Icon
+} from 'antd';
+
 import userActions from '../../state/action/user';
 
 const FormItem = Form.Item;
 
 class Info extends PureComponent {
-
     constructor(props) {
+
         super();
         const { user } = props;
 
@@ -22,7 +27,6 @@ class Info extends PureComponent {
             imageUrl: user.avatar
         };
     }
-
 
     check = () => {
         this.props.form.validateFields(err => {
@@ -39,7 +43,9 @@ class Info extends PureComponent {
             this.state.nickName,
             this.state.imageUrl
         ).then(()=>{
-            history.push('/');
+            setTimeout(()=>{
+                history.push('/');
+            },100)
         }).finally(()=>{
             this.setState({
                 loading: false
@@ -82,20 +88,29 @@ class Info extends PureComponent {
     };
 
     getDisabled(){
-        const { user } = this.props;
-        const { nickName , imageUrl } = this.state;
+        const {
+            user
+        } = this.props;
+        const {
+            nickName ,
+            imageUrl
+        } = this.state;
         return nickName === user.nickname && imageUrl===user.avatar;
     }
 
     render() {
-        const { loading, imageUrl, uploading ,nickName} = this.state;
+        const {
+            loading,
+            imageUrl,
+            uploading ,
+            nickName
+        } = this.state;
         const uploadButton = (
-            <div>
+            <Fragment>
                 <Icon type="plus"/>
                 <div className="ant-upload-text">点击上传</div>
-            </div>
+            </Fragment>
         );
-
         return (
             <div className={styles.form_box}>
                 <FormItem label="昵称" className={styles.from_item_base}>

@@ -1,0 +1,29 @@
+.window_loading {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: rgba(0,0,0,.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .loading_center {
+        width: 100px;
+        height: 100px;
+        border-radius: 6px;
+        background-color: #fff;
+        line-height: 100px;
+        text-align: center;
+    }
+    .loading_icon {
+        width: auto;
+        height: auto;
+        font-size: 48px;
+    }
+
+    &.hide {
+        display: none;
+    }
+}

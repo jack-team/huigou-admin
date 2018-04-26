@@ -1,0 +1,22 @@
+:global {
+    .base-modal-center {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .base-modal-center:before {
+        content: '';
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+        width: 0;
+    }
+
+    .base-modal-center .ant-modal {
+        display: inline-block;
+        vertical-align: middle;
+        top: 0;
+        text-align: left;
+        transform-origin:50% 50% !important;
+    }
+}

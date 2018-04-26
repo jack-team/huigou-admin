@@ -7,21 +7,26 @@ import { message } from 'antd';
 
 import './common/common';
 
+import './common/base.scss';
+
 import store from './state/store';
 
 window.message = message;
 
-import routes from './router';
+import routes from './router/root';
 
 import './common/reset.scss';
 
 import './common/http';
 
+import Container from './components/Container';
 const App = () => (
     <Provider store={store}>
-        <HashRouter>
-            {routes}
-        </HashRouter>
+        <Container>
+            <HashRouter>
+                {routes}
+            </HashRouter>
+        </Container>
     </Provider>
 );
 

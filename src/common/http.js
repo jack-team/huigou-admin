@@ -12,7 +12,7 @@ const get = (url, para) => (
         params: para,
     }).then(({ data }) => {
         if (data.code === 200) {
-            return data;
+            return data.data;
         }
         return Promise.reject(data);
     }).catch(err => {
@@ -27,7 +27,7 @@ const get = (url, para) => (
 const post = (url, para) => (
     instance.post(url, para) .then(({ data }) => {
         if (data.code === 200) {
-            return data;
+            return data.data;
         }
         return Promise.reject(data);
     }).catch(err => {

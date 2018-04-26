@@ -1,0 +1,46 @@
+.mall_category {
+    width: 100%;
+    .add_btn {
+        margin-top: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .form_box {
+        background: #fff;
+        .from_item_base {
+            width: 100%;
+            :global {
+                .ant-form-explain {
+                    margin-top: 2px;
+                }
+            }
+        }
+        :global {
+            .ant-form-item-with-help {
+                margin-bottom: 1px;
+            }
+        }
+    }
+
+    .table_list {
+        .table_body {
+            text-align: center;
+            background-color: #fff;
+            height: 30px;
+            padding: 8px 8px !important;
+        }
+        .table_head {
+            text-align: center;
+            padding: 10px 8px !important;
+            background-color: #f6f6f6;
+        }
+        .table_action {
+            margin-right: 16px;
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}

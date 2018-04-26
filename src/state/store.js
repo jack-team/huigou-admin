@@ -16,6 +16,6 @@ const store = createStoreAsync(
     persistReducer(opts, combineReducers(reducers))
 );
 
-persistStore(store);
+// persistStore(store);
 
 export default store;

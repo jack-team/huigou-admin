@@ -23,36 +23,24 @@ class Login extends PureComponent {
     }
 
     onLogin(e) {
-
         e.preventDefault();
-
         const { userActions } = this.props;
-
-        const userName = trim(this.userName.value);
-        const password = trim(this.password.value);
-
-        const { history } = this.props;
+        const userName = this.userName.value;
+        const passWord = this.password.value;
+        if (!trim(userName) || !trim(passWord)) {
+            return message.error(`用户名或密码不能为空！`);
+        }
 
         // $http.post(`/user/signUp`,{
-        //     username:userName,
-        //     password:password
+        //     userName, passWord
         // });
-
-        if (!userName) {
-            return message.error(`用户名不能为空！`);
-        }
-
-        if (!password) {
-            return message.error(`密码不能为空！`);
-        }
 
         this.setState({
             loading: true
         });
 
-        userActions.signIn(userName, password)
-            .then((cb = () => {
-            }) => {
+        userActions.signIn(userName, passWord)
+            .then((cb = () => {}) => {
                 setTimeout(() => cb(), 800);
             })
             .finally(() => {
@@ -65,11 +53,10 @@ class Login extends PureComponent {
     }
 
     render() {
-
         const { loading } = this.state;
         return (
             <div className={styles.login_page}>
-                <div className={styles.login_layer} onSubmit={this.onLogin}>
+                <form className={styles.login_layer} onSubmit={this.onLogin}>
                     <p className={styles.welcome}>
                         欢迎登录
                     </p>
@@ -93,11 +80,11 @@ class Login extends PureComponent {
                     <Button
                         className={styles.submit}
                         loading={loading}
-                        onClick={this.onLogin}
+                        htmlType="submit"
                     >
                         {loading ? `登录中...` : `登录`}
                     </Button>
-                </div>
+                </form>
             </div>
         );
     }
