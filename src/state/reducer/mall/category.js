@@ -22,19 +22,22 @@ export default (state = initState, action) => {
 
         case types.UPDATE_CATEGORY: {
             const { list } = state;
+
             const {
-                categoryName,
-                limit,
                 categoryId,
-                page
+                page,
             } = data;
 
             const pageKey = `page${page}`;
             const pageList = list[pageKey];
-            const findIndex = pageList.findIndex(item=>item.categoryId===categoryId);
-            pageList[findIndex].categoryName=categoryName;
-            pageList[findIndex].limit = limit;
-            list[pageKey]=pageList;
+
+            const findIndex = pageList.findIndex(item => (
+                item.categoryId === categoryId
+            ));
+
+            pageList[findIndex] = data;
+            list[pageKey] = pageList;
+
             return {
                 ...state,
                 list:list

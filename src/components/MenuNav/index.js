@@ -22,6 +22,8 @@ class MenuNav extends PureComponent {
         };
     }
 
+    menuList = menuList;
+
     toggle = () => {
         this.setState({
             collapsed: !this.state.collapsed,
@@ -49,7 +51,7 @@ class MenuNav extends PureComponent {
     }
 
     getOpenKeys(pathname) {
-        const { path } = menuList.find(menu => {
+        const { path } = this.menuList.find(menu => {
             const { path, children = [] } = menu;
             return pathname.includes(path) && !!children.length;
         }) || {};
@@ -113,9 +115,32 @@ class MenuNav extends PureComponent {
         );
     }
 
+    getMenuKeys(subKey) {
+        const { menuList } = this;
+        const pathName = this.getPathName(this.props);
+        if(!!subKey) {
+            const {
+                children = []
+            } = menuList.find(menu => {
+                return subKey === menu.path;
+            }) || {};
+            const {
+                path
+            } = children.find(menu => {
+                const fullPath = `${subKey}${menu.path}`;
+                return pathName.includes(fullPath);
+            }) || {};
+            return [`${subKey}${path}`]
+        }
+        const baseMatch = menuList.find(  menu => {
+            return pathName.includes(menu.path);
+        });
+        return !!baseMatch ? [baseMatch.path] : [];
+    }
+
     render() {
         const { collapsed, isTrigger, openKeys } = this.state;
-        const pathname = this.getPathName(this.props);
+        const menuKeys = this.getMenuKeys(openKeys[0]);
         const { history } = this.props;
         return (
             <Layout.Sider
@@ -135,12 +160,12 @@ class MenuNav extends PureComponent {
                     inlineIndent={20}
                     className={styles.base_menu}
                     openKeys={collapsed && isTrigger ? [] : openKeys}
-                    selectedKeys={[pathname]}
+                    selectedKeys={menuKeys}
                     defaultOpenKeys={openKeys}
-                    defaultSelectedKeys={[pathname]}
+                    defaultSelectedKeys={menuKeys}
                     onSelect={item => history.push(item.key)}
                 >
-                    {menuList.map(menu => {
+                    {this.menuList.map(menu => {
                         const { children = [] } = menu;
                         return !!children.length ?
                             this.renderSubItem(menu) :

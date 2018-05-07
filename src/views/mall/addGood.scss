@@ -1,0 +1,54 @@
+.add_good {
+    .form_box {
+        margin-top: 20px;
+        background-color: #fff;
+        padding-left: 20px;
+    }
+
+    .form_inner {
+        width: 70%;
+        padding: 20px;
+    }
+
+    .range_cnter {
+        margin: 0 20px;
+    }
+
+    .coverImage , .item_image{
+        width: 100%;
+        height: 100%;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .item_image {
+        width: 102px;
+        height: 102px;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .upload_list {
+        display: flex;
+    }
+
+    .editor_wrapper_className {
+        button {
+            line-height: 1em;
+        }
+    }
+
+    .editor_content_class {
+        min-height: 300px;
+        padding: 0 10px;
+        border: 1px solid #ececec;
+        background-color: #f6f6f6;
+    }
+
+    :global{
+        .ant-form-text {
+            color: #999;
+        }
+    }
+}

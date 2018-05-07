@@ -16,6 +16,7 @@
     justify-content: space-between;
     line-height: 1em;
     height: 50px;
+    border-bottom: 1px solid #ececec;
 
     .com_header_left {
         height: 100%;
@@ -92,6 +93,5 @@
     .center_content {
         padding: 14px;
         background-color: #f1f2f7;
-        border-top: 1px solid #ececec;
     }
 }

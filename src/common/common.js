@@ -11,3 +11,7 @@ window.getUrlArgument= function(search=window.location.search,name){
     if(result === null || result.length < 1) return null;
     return decodeURI(result[1]);
 };
+
+import moment from 'moment';
+
+moment.locale('zh-cn');

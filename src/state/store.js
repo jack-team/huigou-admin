@@ -1,5 +1,7 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
-import { persistStore, persistReducer } from 'redux-persist';
+import {
+    persistStore,
+    persistReducer } from 'redux-persist';
 
 import thunk from 'redux-thunk';
 import session from 'redux-persist/lib/storage/session';
@@ -9,13 +11,14 @@ import reducers from './reducer';
 
 const opts = {
     key: 'hg',
-    storage: session
+    storage: session,
+    blacklist:[`user`]
 };
 
 const store = createStoreAsync(
     persistReducer(opts, combineReducers(reducers))
 );
 
-// persistStore(store);
+persistStore(store);
 
 export default store;

@@ -22,13 +22,13 @@ class BaseBreadcrumb extends PureComponent {
     itemRender = (route, params, routes, paths) => {
         const last = routes.indexOf(route) === routes.length - 1;
         return last ? <span className={styles.current}>{route.breadcrumbName}</span> :
-            <Link to={paths.join('/')}>{route.breadcrumbName}</Link>;
+            <Link to={route.path}>{route.breadcrumbName}</Link>;
     };
 
     render() {
         const { routes } = this.props;
         const baseRoute = [{
-            path: '',
+            path: '/home/index',
             breadcrumbName: '平台首页'
         }];
         return (

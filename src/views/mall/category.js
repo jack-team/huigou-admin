@@ -8,7 +8,7 @@ import {
     Input,
     Table,
     Popconfirm,
-    Pagination
+    Divider
 } from 'antd';
 
 const routes = [{
@@ -24,7 +24,7 @@ import styles from './category.scss';
 
 class Category extends PureComponent {
 
-    constructor( {location} ) {
+    constructor(props) {
         super();
         this.columns = [{
             title: `排序`,
@@ -42,16 +42,24 @@ class Category extends PureComponent {
                 className: styles.table_head
             })
         }, {
+            title: `更新时间`,
+            dataIndex: `updateAt`,
+            width: 210,
+            className: styles.table_body,
+            onHeaderCell: () => ({
+                className: styles.table_head
+            })
+        },{
             title: `添加时间`,
             dataIndex: `createAt`,
-            width: 300,
+            width: 210,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
             })
         }, {
             title: `操作`,
-            width: 200,
+            width: 230,
             key: 'action',
             className: styles.table_body,
             render: this.renderTableAction,
@@ -59,33 +67,54 @@ class Category extends PureComponent {
                 className: styles.table_head
             })
         }];
-        const page = getUrlArgument(location.search,'page') || 1;
-        this. state = {
-            showModal: false,
-            page:~~page,
-            loading: false,
+        this.state = {
             limit: '',
+            categoryId: '',
             categoryName: '',
             isEditor: false,
-            categoryId: ''
+            loading: false,
+            showModal: false,
+            tableLoading:false,
+            page: this.getPage(props),
         };
     };
 
     limit = null;
     categoryName = null;
 
+    componentDidMount() {
+        this.loadList();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const page = this.getPage(nextProps);
+        if (page !== this.state.page) {
+            this.goPage(page).then(()=>{
+                this.loadList();
+            })
+        }
+    }
+
+    getPage = ({ location }) => {
+        let page = getUrlArgument(location.search, 'page') || 1;
+        page = ~~page;
+        return page;
+    };
+
     renderTableAction = item => {
         return (
             <Fragment>
-                <a className={styles.table_action}
-                    onClick={() => this.openEditor(item)}>编辑</a>
+                <a className={styles.action_btn} onClick={() =>this.openEditor(item)}>
+                    编辑
+                </a>
+                <Divider type="vertical" />
                 <Popconfirm
                     title="确定要删除吗？"
                     okText="确定"
                     cancelText="取消"
                     onConfirm={() => this.delete(item)}
                 >
-                    <a className={styles.table_action}>删除</a>
+                    <a className={styles.action_btn}>删除</a>
                 </Popconfirm>
             </Fragment>
         );
@@ -101,7 +130,7 @@ class Category extends PureComponent {
     };
 
     editor() {
-        const { categoryId , page } = this.state;
+        const { categoryId, page } = this.state;
         const { form, mallCategoryActions } = this.props;
         const limit = form.getFieldValue('limit'),
             categoryName = form.getFieldValue('categoryName');
@@ -113,22 +142,27 @@ class Category extends PureComponent {
             categoryName,
             limit,
             page
-        )
-            .finally(() => {
-                this.setState({
-                    loading: false
-                }, () => this.closeModal());
+        ).then(()=>{
+            setTimeout(() => {
+                this.closeModal();
+            },100)
+        }).finally(() => {
+            this.setState({
+                loading: false
             });
+        });
     }
 
     delete = item => {
         const { categoryId } = item;
         const { mallCategoryActions } = this.props;
         loading();
-        mallCategoryActions.deleteCategory(categoryId,this.state.page)
-            .finally(() => {
-                loadingClose();
-            });
+        mallCategoryActions.deleteCategory(
+            categoryId,
+            this.state.page
+        ).finally(() => {
+            loadingClose();
+        });
     };
 
     openModal = () => {
@@ -151,42 +185,27 @@ class Category extends PureComponent {
         });
     };
 
-    componentWillReceiveProps({location}){
-        let page = getUrlArgument(location.search,'page') || 1;
-        page = ~~page;
-        if(page !== this.state.page) {
-            this.setState({
-                page:page
-            },()=>{
-                this.loadList();
-            });
-        }
-    }
-
     addCategory = () => {
-        const { mallCategoryActions, form ,history , location} = this.props;
-        const limit =  form.getFieldValue('limit'),
+        const { mallCategoryActions, form } = this.props;
+        const limit = form.getFieldValue('limit'),
             categoryName = form.getFieldValue('categoryName');
 
         this.setState({
             loading: true
         });
-
-        mallCategoryActions.addCategory(categoryName, ~~limit)
-            .then(() => {
-                setTimeout(() => {
-                    this.closeModal();
-                }, 100);
-                this.goPage(1).then(page => {
-                    history.push(`${location.pathname}?page=${page}`);
-                    this.loadList();
-                });
-            })
-            .finally(() => {
-                this.setState({
-                    loading: false
-                });
+        mallCategoryActions.addCategory(
+            categoryName,
+            ~~limit
+        ).then(() => {
+            setTimeout(() =>{
+                this.closeModal();
+                this.tableChange({ current:1 });
+            }, 100);
+        }).finally(() => {
+            this.setState({
+                loading: false
             });
+        });
     };
 
     clearState = () => {
@@ -205,33 +224,58 @@ class Category extends PureComponent {
         });
     };
 
-    componentDidMount() {
-        this.loadList();
-    }
+    loadList() {
 
-    loadList(){
         const {
             mallCategoryActions
         } = this.props;
-        const { page } = this.state;
-        mallCategoryActions.getCategoryList(page);
+
+        const {
+            page,
+            searchName
+        } = this.state;
+
+        this.setState({
+            tableLoading:true
+        });
+
+        mallCategoryActions.getCategoryList(
+            page,
+            searchName
+        ).finally(()=>{
+            this.setState({
+                tableLoading:false
+            });
+        });
     }
 
-    handleTableChange = ({ current }) => {
-        const { history , location } = this.props;
-        this.goPage(current).then(page => {
-            history.push(`${location.pathname}?page=${page}`);
+    tableChange = ({ current }) => {
+        const { history, location } = this.props;
+        const { page } = this.state;
+        this.goPage(current).then(currentPage => {
             this.loadList();
+            if(page !== currentPage) {
+                history.push(
+                    `${location.pathname}?page=${currentPage}`
+                );
+            }
         });
     };
 
-    goPage(page){
-        return new Promise(resolve => {
+    goPage = page => (
+        new Promise(resolve => (
             this.setState({
-                page:page
-            },()=>resolve(page));
+                page: page
+            }, () => resolve(page))
+        ))
+    );
+
+    handleSubmit=e=>{
+        e.preventDefault();
+        this.tableChange({
+            current:1
         })
-    }
+    };
 
     render() {
         const {
@@ -240,7 +284,9 @@ class Category extends PureComponent {
             limit,
             categoryName,
             page,
-            isEditor
+            isEditor,
+            searchName,
+            tableLoading
         } = this.state;
         const { mallCategory, form } = this.props;
         const { getFieldDecorator } = form;
@@ -252,6 +298,20 @@ class Category extends PureComponent {
                     routes={routes}
                 />
                 <div className={styles.add_btn}>
+                    <Form layout="inline" onSubmit={this.handleSubmit}>
+                        <Form.Item>
+                            <Input
+                                placeholder="分类名称"
+                                value={searchName}
+                                onChange={e=>this.setState({
+                                    searchName:e.target.value
+                                })}
+                            />
+                        </Form.Item>
+                        <Button type="primary" htmlType="submit">
+                            搜索
+                        </Button>
+                    </Form>
                     <Button type="primary" onClick={this.clearState}>
                         添加
                     </Button>
@@ -259,15 +319,17 @@ class Category extends PureComponent {
                 <Table
                     className={styles.table_list}
                     pagination={{
-                        current:page,
+                        current: page,
                         pageSize: pageSize,
                         total: pageSize * pageTotal
                     }}
+                    useFixedHeader={true}
+                    loading={tableLoading}
                     bordered
                     columns={this.columns}
                     dataSource={[].concat(dataSource)}
                     rowKey={({ categoryId }) => categoryId}
-                    onChange={this.handleTableChange}
+                    onChange={this.tableChange}
                 />
                 <Modal
                     visible={showModal}

@@ -14,18 +14,18 @@ export default {
         )
     },
     //获取分类列表
-    getCategoryList(page=1,pageSize=15){
-        loading();
+    getCategoryList(page=1,searchName,pageSize=15){
         return dispatch => (
             $http.get(`/mall/category/list`,{
                 page:page,
-                pageSize:pageSize
+                pageSize:pageSize,
+                searchName:searchName
             }).then(data=>{
                 dispatch({
                     type:types.GET_LIST,
                     data:data
                 });
-            }).finally(()=>loadingClose())
+            })
         )
     },
     //修改分类
@@ -36,11 +36,11 @@ export default {
             limit
         };
         return dispatch => (
-            $http.post('/mall/category/editor', para).then(()=>{
+            $http.post('/mall/category/editor', para).then(data=>{
                 dispatch({
                     type:types.UPDATE_CATEGORY,
                     data:{
-                        ...para,
+                        ...data,
                         page
                     }
                 });
@@ -68,6 +68,14 @@ export default {
             }).catch(err=>{
                 message.error(err.message);
                 return Promise.reject();
+            })
+        )
+    },
+    //添加商品
+    addGoods(params) {
+        return dispatch => (
+            $http.post(`mall/goods/add`,{
+                ...params
             })
         )
     }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import { Button } from 'antd';
+import { Button ,Input } from 'antd';
 
 import styles from './../styles/login.scss';
 
