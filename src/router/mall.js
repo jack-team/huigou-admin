@@ -32,6 +32,11 @@ export default props => {
                 component={AddGoods}
                 exact
             />
+            <Route
+                path={`${path}/manage/:id`}
+                component={AddGoods}
+                exact
+            />
         </Switch>
     );
 }

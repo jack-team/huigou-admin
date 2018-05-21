@@ -1,15 +1,23 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, {
+    PureComponent,
+    Fragment
+} from 'react';
 import { Link } from 'react-router-dom';
 import styles from './addGood.scss';
 import Breadcrumb from './../../components/Breadcrumb';
-import { Editor } from 'react-draft-wysiwyg';
+import {
+    Editor
+} from 'react-draft-wysiwyg';
+
 import draftToHtml from 'draftjs-to-html';
-import htmlToDraft from 'html-to-draftjs';
+
+import moment from 'moment';
 
 import {
     EditorState,
     convertToRaw,
-    ContentState
+    convertFromHTML,
+    ContentState,
 } from 'draft-js';
 
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -29,11 +37,10 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 
 import connect from './../../common/connect';
-import categoryActions from './../../state/action/mall/category';
-
 import BaseUpload from './../../components/Upload';
-
 import enZh from 'antd/lib/date-picker/locale/zh_CN';
+
+import categoryActions from './../../state/action/mall/category';
 
 const routes = [{
     path: '/home/mall/manage',
@@ -44,73 +51,154 @@ const routes = [{
 }];
 
 class AddGood extends PureComponent {
-    constructor() {
+    constructor(props) {
         super();
+        const {
+            params
+        } = props.match;
         this.state = {
-            startValue: null,
-            categoryId:null,
-            endValue: null,
-            endOpen: false,
-            uploadCover: false,
-            coverUrl: null,
-            uploadItemImg:false,
-            itemImg:[],
-            isSearching:false,
-            editorState:null
+            //是否在搜索中
+            searching: false,
+            //banner 图片
+            banners: [],
+            //封面图片
+            cover: null,
+            //是否在上传封面
+            uploadingCover: false,
+            //是否在上传banner
+            uploadingBanner: false,
+            //上架时间
+            liveStart:null,
+            //下架时间
+            liveEnd:null,
+            //富文本
+            desc:null,
+            loadingState:false
         };
+        this.goodsId =params.id;
+        this.isEditor = !!this.goodsId;
+
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.searchCategory();
+        if(this.isEditor) {
+            this.fetchData();
+        }
     };
 
-    searchCategory =( keyword = null )=>{
-        const { categoryActions } = this.props;
-        this.setState({
-            isSearching:true
-        });
-        categoryActions.getCategoryList(1, keyword, 100).finally(()=> {
+    fetchData(){
+        const {
+            categoryActions ,
+            form
+        } = this.props;
+        categoryActions.getGoods(this.goodsId).then( data => {
+
             this.setState({
-                isSearching:false
+                categoryId:data.categoryId,
+                cover:data.cover,
+                desc:data.desc,
+                goodsName:data.goodsName,
+                limit:data.limit,
+                liveStart:data.liveStart,
+                liveEnd:data.liveEnd,
+                price:data.price,
+                stock:data.stock,
+                banners:data.banners
+            });
+        });
+    }
+
+    searchCategory = (keyword = null) => {
+        const {
+            categoryActions
+        } = this.props;
+        this.setState({
+            searching: true
+        });
+        categoryActions.getCategoryList(1, keyword, 40).finally(() => {
+            this.setState({
+                searching: false
             });
         });
     };
 
-
     handleSubmit = e => {
         e.preventDefault();
-        const { validateFields } = this.props.form;
-        validateFields((err, fieldsValue)=>{
-            if(!err) this.addGoods(fieldsValue);
+        const {
+            validateFields
+        } = this.props.form;
+        validateFields((err, fields) => {
+            if (!err) this.save(fields);
         });
     };
 
-
-    addGoods(fieldsValue){
+    save( fields ){
         const {
             categoryId,
-            coverUrl,
-            itemImg,
-            editorState
+            goodsName,
+            liveStart,
+            liveEnd,
+            price,
+            stock,
+            limit
+        } = fields;
+
+        const {
+            banners,
+            cover,
+            desc
         } = this.state;
+
         const params = {
-            categoryId:categoryId,
-            goodsName:fieldsValue.goodName,
-            price:fieldsValue.prices,
-            stock:fieldsValue.stock,
-            liveStart:fieldsValue.startTime,
-            liveEnd:fieldsValue.endTime,
-            cover:coverUrl,
-            banners:itemImg,
-            desc:editorState,
+            categoryId,
+            goodsName,
+            liveStart,
+            liveEnd,
+            price,
+            stock,
+            banners,
+            cover,
+            desc,
+            limit
         };
 
-        const { categoryActions } = this.props;
-        categoryActions.addGoods(params);
+        let errMsg = null;
+
+        if(!cover) {
+            errMsg = `请上传封面图片！`;
+        }
+
+        if(!banners.length) {
+            errMsg = `请上传banner图片！`;
+        }
+
+        if(!desc) {
+            errMsg = `请上传商品详情！`;
+        }
+
+        if(errMsg) return message.error(errMsg);
+
+        this.setState({
+            loadingState:true
+        });
+
+        const {
+            categoryActions,
+            history
+        } = this.props;
+
+        categoryActions.addGoods(params).then(() => {
+            history.push('/home/mall/manage')
+        }).finally(()=>{
+            this.setState({
+                loadingState:false
+            });
+        })
     }
 
     disabledStartDate = (startValue) => {
-        const endValue = this.state.endValue;
+        const endValue = this.state.liveEnd;
         if (!startValue || !endValue) {
             return false;
         }
@@ -118,7 +206,7 @@ class AddGood extends PureComponent {
     };
 
     disabledEndDate = (endValue) => {
-        const startValue = this.state.startValue;
+        const startValue = this.state.liveStart;
         if (!endValue || !startValue) {
             return false;
         }
@@ -132,44 +220,40 @@ class AddGood extends PureComponent {
     };
 
     onStartChange = (value) => {
-        this.onChange('startValue', value);
-    };
-
-    onEndChange = (value) => {
-        this.onChange('endValue', value);
-    };
-
-    handleStartOpenChange = (open) => {
-        if (!open) {
-            this.setState({ endOpen: true });
-        }
-    };
-
-    handleEndOpenChange = (open) => {
-        this.setState({ endOpen: open });
-    };
-
-
-    uploadCoverSuccess = url => {
         this.setState({
-            coverUrl: url,
-            uploadCover: false
-        });
-    };
-
-    uploadItemImgSuccess = url=> {
-        const { itemImg } = this.state;
-        itemImg.push(url);
-        this.setState({
-            itemImg:[].concat(itemImg),
-            uploadItemImg:false
+            liveStart:value
         })
     };
 
-    onEditorStateChange=editorState=>{
-        const htmlStr = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    onEndChange = (value) => {
         this.setState({
-            editorState:htmlStr
+            liveEnd:value
+        })
+    };
+
+    uploadCoverSuccess = url => {
+        this.setState({
+            cover: url,
+            uploadingCover: false
+        });
+    };
+
+    uploadBannerSuccess = url => {
+        const {
+            banners
+        } = this.state;
+        banners.push(url);
+        this.setState({
+            banners: [].concat(banners),
+            uploadingBanner: false
+        });
+    };
+
+    onEditorStateChange = editorState => {
+        this.setState({
+            desc: draftToHtml(
+                convertToRaw(editorState.getCurrentContent())
+            )
         });
     };
 
@@ -177,210 +261,270 @@ class AddGood extends PureComponent {
         this.searchCategory(text);
     };
 
-    getCategoryList(){
+    getCategoryList() {
         const { mallCategory } = this.props;
         return mallCategory.list[`page${1}`] || [];
     }
 
+    coverUploadBefore = () => {
+        this.setState({
+            uploadingCover: true
+        });
+    };
+
+    uploadBannerBefore = () => {
+        const { banners } = this.state;
+        if(banners > 10) return false;
+        this.setState({
+            uploadingBanner: true
+        });
+    };
+
+    getDefaultEditorState = str => {
+        if(!str)  return EditorState.createEmpty();
+        const contentBlocks = convertFromHTML(str);
+        return EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks));
+    };
+
     render() {
-        const { getFieldDecorator } = this.props.form;
         const {
-            startValue,
-            endValue,
-            endOpen,
-            uploadCover,
-            coverUrl,
-            uploadItemImg,
-            itemImg,
-            isSearching
+            state
+        } = this;
+        const {
+            form
+        } = this.props;
+
+        const {
+            getFieldDecorator
+        } = form;
+
+        const {
+            banners,
+            searching,
+            cover,
+            liveStart,
+            liveEnd,
+            uploadingCover,
+            uploadingBanner,
+            loadingState
         } = this.state;
         const categoryList = this.getCategoryList();
+        const inputStyle = {
+            width:350
+        };
+
+        const desc = this.getDefaultEditorState(state.desc);
+
         return (
-            <div className={styles.add_good}>
+            <Fragment>
                 <Breadcrumb routes={routes}/>
-                <div className={styles.form_box}>
-                    <div className={styles.form_inner}>
-                        <Form onSubmit={this.handleSubmit}>
-                            <FormItem label="分类名称">
-                                {getFieldDecorator('categoryName', {
-                                    rules: [{
-                                        required: true,
-                                        message: '分类名称不能为空!'
-                                    }],
-                                })(
-                                    <Select
-                                        showSearch
-                                        onSearch={this.fetchCategory}
-                                        style={{ width: 320 }}
-                                        placeholder="请选择或输入分类名称"
-                                        notFoundContent={isSearching && <Spin size="small"/>}
-                                        optionFilterProp="children"
-                                        onChange={(e)=>{
-                                            this.setState({
-                                                categoryId:e
-                                            })
-                                        }}
-                                    >
-                                        {categoryList.map( option => {
-                                            const {
-                                                categoryId ,
-                                                categoryName
-                                            } = option;
-                                            return (
-                                                <Option key={categoryId} value={categoryId}>
-                                                    {categoryName}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem label="商品名称" hasFeedback>
-                                {getFieldDecorator('goodName', {
-                                    rules: [{
-                                        required: true,
-                                        message: '商品名称不能为空！'
-                                    }],
-                                })(<Input
-                                    style={{width:320}}
-                                    placeholder="请输入商品名称"
-                                />)}
-                            </FormItem>
-                            <FormItem label="商品价格">
-                                {getFieldDecorator('prices', {
-                                    rules: [{
-                                        required: true,
-                                        message: '商品价格不能为空！'
-                                    }],
-                                })(<InputNumber
-                                    min={1}
-                                    max={10000000000}
-                                    style={{width:320}}
-                                    placeholder="请输入价格（单位：分）"
-                                />)}
-                            </FormItem>
-                            <FormItem label="库存数量">
-                                {getFieldDecorator('stock', {
-                                    rules: [{
-                                        required: true,
-                                        message: '商品库存不能为空！'
-                                    }],
-                                })(<InputNumber
-                                    min={1}
-                                    max={10000000000}
-                                    style={{width:320}}
-                                    placeholder="请输入库存"
-                                />)}
-                            </FormItem>
-                            <FormItem label="上架时间">
-                                {getFieldDecorator('startTime', {
-                                    rules: [{
-                                        required: true,
-                                        message: '开始时间不能为空！'
-                                    }],
-                                })(<DatePicker
-                                    disabledDate={this.disabledStartDate}
-                                    showTime
-                                    style={{width:320}}
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    setFieldsValue={startValue}
-                                    placeholder="开始日期"
-                                    onChange={this.onStartChange}
-                                    onOpenChange={this.handleStartOpenChange}
-                                    locale={enZh}
-                                />)}
-                            </FormItem>
-                            <FormItem label="下架时间">
-                                {getFieldDecorator('endTime', {
-                                    rules: [{
-                                        required: true,
-                                        message: '截止时间不能为空！'
-                                    }],
-                                })(<DatePicker
-                                    disabledDate={this.disabledEndDate}
-                                    showTime
-                                    style={{width:320}}
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    setFieldsValue={endValue}
-                                    placeholder="截止日期"
-                                    onChange={this.onEndChange}
-                                    open={endOpen}
-                                    locale={enZh}
-                                    onOpenChange={this.handleEndOpenChange}
-                                />)}
-                            </FormItem>
-                            <FormItem label="封面图片（最多上传1张）" extra="">
-                                <BaseUpload
-                                    uploadBefore={() => {
-                                        this.setState({
-                                            uploadCover: true
-                                        });
-                                    }}
-                                    uploadSuccess={this.uploadCoverSuccess}
-                                >
-                                    {coverUrl ?
-                                        (<div
-                                            style={{ backgroundImage: `url(${coverUrl})` }}
-                                            className={styles.coverImage}
-                                        />) :
-                                        <Fragment>
-                                            <Icon type={uploadCover ? 'loading' : 'plus'}/>
-                                            <div className="ant-upload-text">点击上传</div>
-                                        </Fragment>
-                                    }
-                                </BaseUpload>
-                            </FormItem>
-                            <FormItem label="商品图片（最多上传10张）" extra="">
-                                <div className={styles.upload_list}>
-                                    {itemImg.map(url=>(
-                                        <div
-                                            key={url}
-                                            style={{ backgroundImage: `url(${url})` }}
-                                            className={styles.item_image}
-                                        />
-                                    ))}
-                                    <BaseUpload
-                                        uploadBefore={() => {
-                                            if(itemImg.length >=10 ) {
-                                                return false
-                                            }
-                                            this.setState({
-                                                uploadItemImg: true
-                                            });
-                                        }}
-                                        uploadSuccess={this.uploadItemImgSuccess}
-                                    >
-                                        <Fragment>
-                                            <Icon type={uploadItemImg ? 'loading' : 'plus'}/>
-                                            <div className="ant-upload-text">点击上传</div>
-                                        </Fragment>
-                                    </BaseUpload>
-                                </div>
-                            </FormItem>
-                            <FormItem label="商品详情">
-                                <Editor
-                                    localization={{ locale: 'zh'}}
-                                    toolbarClassName="toolbar-class"
-                                    onEditorStateChange={this.onEditorStateChange}
-                                    editorClassName={styles.editor_content_class}
-                                    wrapperClassName={styles.editor_wrapper_className}
+                <Form className={styles.goods_form} onSubmit={this.handleSubmit}>
+                    <Form.Item label="分类名称">
+                        {getFieldDecorator(`categoryId`, {
+                            rules: [{
+                                required: true,
+                                message: '分类名称不能为空!'
+                            }]
+                        })(
+                            <Select
+                                showSearch={true}
+                                optionFilterProp="children"
+                                notFoundContent = {
+                                    searching ? (
+                                        <Icon type="loading"/>
+                                    ):`没有该分类`
+                                }
+                                onSearch={this.fetchCategory}
+                                style={inputStyle}
+                                placeholder="请选择或输入分类名称"
+                            >
+                                {categoryList.map(option => {
+                                    const {
+                                        categoryId,
+                                        categoryName
+                                    } = option;
+                                    return (
+                                        <Option
+                                            key={categoryId}
+                                            value={categoryId}
+                                        >
+                                            {categoryName}
+                                        </Option>
+                                    );
+                                })}
+                            </Select>
+                        )}
+                    </Form.Item>
+                    <FormItem label="商品名称" hasFeedback>
+                        {getFieldDecorator('goodsName', {
+                            initialValue:state.goodsName,
+                            rules: [{
+                                required: true,
+                                message: '商品名称不能为空！'
+                            }]
+                        })(
+                            <Input
+                                style={inputStyle}
+                                placeholder="请输入商品名称"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="商品价格">
+                        {getFieldDecorator('price', {
+                            initialValue:state.price,
+                            rules: [{
+                                required: true,
+                                message: '商品价格不能为空！'
+                            }],
+                        })(
+                            <InputNumber
+                                min={1}
+                                max={10000000000}
+                                style={inputStyle}
+                                placeholder="请输入价格（单位：分）"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="库存数量">
+                        {getFieldDecorator('stock', {
+                            initialValue:state.stock,
+                            rules: [{
+                                required: true,
+                                message: '商品库存不能为空！'
+                            }],
+                        })(
+                            <InputNumber
+                                min={1}
+                                max={10000000000}
+                                style={inputStyle}
+                                placeholder="请输入库存"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="上架时间">
+                        {getFieldDecorator('liveStart', {
+                            initialValue:moment(state.liveStart),
+                            rules: [{
+                                required: true,
+                                message: '开始时间不能为空！'
+                            }],
+                        })(
+                            <DatePicker
+                                locale={enZh}
+                                showTime={true}
+                                style={inputStyle}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                setFieldsValue={liveStart}
+                                placeholder="开始日期"
+                                onChange={this.onStartChange}
+                                disabledDate={this.disabledStartDate}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="下架时间">
+                        {getFieldDecorator('liveEnd', {
+                            initialValue:moment(state.liveEnd),
+                            rules: [{
+                                required: true,
+                                message: '截止时间不能为空！'
+                            }],
+                        })(
+                            <DatePicker
+                                showTime={true}
+                                locale={enZh}
+                                style={inputStyle}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                setFieldsValue={liveEnd}
+                                placeholder="截止日期"
+                                onChange={this.onEndChange}
+                                disabledDate={this.disabledEndDate}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="商品排序">
+                        {getFieldDecorator('limit', {
+                            initialValue:state.limit,
+                            rules: [{
+                                required: true,
+                                message: '排序不能为空！'
+                            }],
+                        })(
+                            <InputNumber
+                                min={1}
+                                max={10000000000}
+                                style={inputStyle}
+                                placeholder="请输入排序"
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem label="封面图片" extra="(最多上传1张)">
+                        <BaseUpload
+                            uploadBefore={this.coverUploadBefore}
+                            uploadSuccess={this.uploadCoverSuccess}
+                        >
+                            {!!cover ? (
+                                <div
+                                    className={styles.coverImage}
+                                    style={{ backgroundImage: `url(${cover})` }}
                                 />
-                            </FormItem>
-                            <FormItem>
-                                <Button type="primary" htmlType="submit">
-                                    保存
-                                </Button>
-                            </FormItem>
-                        </Form>
-                    </div>
-                </div>
-            </div>
+                            ):(
+                                <Fragment>
+                                    <Icon type={uploadingCover ? 'loading' : 'plus'}/>
+                                    <div className="ant-upload-text">
+                                        点击上传
+                                    </div>
+                                </Fragment>
+                            )}
+                        </BaseUpload>
+                    </FormItem>
+                    <FormItem label="商品图片" extra="(最多上传10张)">
+                        <div className={styles.upload_list}>
+                            {banners.map(url => (
+                                <div
+                                    key={url}
+                                    className={styles.item_image}
+                                    style={{ backgroundImage: `url(${url})` }}
+                                />
+                            ))}
+                            <BaseUpload
+                                uploadBefore={this.uploadBannerBefore}
+                                uploadSuccess={this.uploadBannerSuccess}
+                            >
+                                <Fragment>
+                                    <Icon type={uploadingBanner ? 'loading' : 'plus'}/>
+                                    <div className="ant-upload-text">
+                                        点击上传
+                                    </div>
+                                </Fragment>
+                            </BaseUpload>
+                        </div>
+                    </FormItem>
+                    <FormItem label="商品详情">
+                        <Editor
+                            localization={{ locale: 'zh' }}
+                            toolbarClassName="toolbar-class"
+                            onEditorStateChange={this.onEditorStateChange}
+                            editorClassName={styles.editor_content_class}
+                            wrapperClassName={styles.editor_wrapper_className}
+                            editorState={desc}
+                        />
+                    </FormItem>
+                    <FormItem>
+                        <Button
+                            loading={loadingState}
+                            type="primary"
+                            htmlType="submit"
+                        >
+                            {`保存${loadingState?`中..`:``}`}
+                        </Button>
+                    </FormItem>
+                </Form>
+            </Fragment>
         );
     }
 }
 
 const CurrentForm = Form.create()(AddGood);
-
-export default connect(['mallCategory'],{
+export default connect(['mallCategory'], {
     categoryActions
 })(CurrentForm);

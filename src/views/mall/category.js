@@ -308,9 +308,11 @@ class Category extends PureComponent {
                                 })}
                             />
                         </Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            搜索
-                        </Button>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit">
+                                搜索
+                            </Button>
+                        </Form.Item>
                     </Form>
                     <Button type="primary" onClick={this.clearState}>
                         添加

@@ -74,8 +74,16 @@ export default {
     //添加商品
     addGoods(params) {
         return dispatch => (
-            $http.post(`mall/goods/add`,{
+            $http.post(`/mall/goods/add`,{
                 ...params
+            })
+        )
+    },
+    //获取商品
+    getGoods( id ){
+        return dispatch => (
+            $http.get(`/mall/goods/detail`,{
+                id:id
             })
         )
     }
