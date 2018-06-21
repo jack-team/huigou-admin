@@ -188,7 +188,7 @@ class Manage extends PureComponent{
                     bordered
                     columns={this.columns}
                     dataSource={[].concat(dataSource)}
-                    rowKey={({ categoryId }) => categoryId}
+                    rowKey={({ goodsId }) => goodsId}
                     onChange={this.tableChange}
                 />
             </div>

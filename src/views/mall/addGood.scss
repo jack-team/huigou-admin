@@ -1,8 +1,18 @@
 .goods_form {
     background-color: #fff;
-    padding: 16px 10% 16px 16px;
+    padding: 16px 20px 16px 20px;
     margin-top: 16px;
     border-radius: 4px;
+
+    :global {
+        .ant-form-item {
+            display: flex;
+        }
+
+        .ant-form-item-control-wrapper {
+            flex: 1;
+        }
+    }
 }
 
 
@@ -35,8 +45,12 @@
 }
 
 .editor_wrapper_className {
-    button {
-        line-height: 1em;
+    :global {
+        .tab-group {
+            .tab-nav {
+                height: 58px;
+            }
+        }
     }
 }
 

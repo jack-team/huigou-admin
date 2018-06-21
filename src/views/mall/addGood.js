@@ -5,22 +5,8 @@ import React, {
 import { Link } from 'react-router-dom';
 import styles from './addGood.scss';
 import Breadcrumb from './../../components/Breadcrumb';
-import {
-    Editor
-} from 'react-draft-wysiwyg';
-
-import draftToHtml from 'draftjs-to-html';
 
 import moment from 'moment';
-
-import {
-    EditorState,
-    convertToRaw,
-    convertFromHTML,
-    ContentState,
-} from 'draft-js';
-
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 import {
     Form,
@@ -29,9 +15,12 @@ import {
     Button,
     Icon,
     Input,
-    Spin,
-    DatePicker
+    DatePicker,
+    Row,
+    Col
 } from 'antd';
+
+import Editor from './../../components/Editor';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -68,45 +57,45 @@ class AddGood extends PureComponent {
             //是否在上传banner
             uploadingBanner: false,
             //上架时间
-            liveStart:null,
+            liveStart: null,
             //下架时间
-            liveEnd:null,
+            liveEnd: null,
             //富文本
-            desc:null,
-            loadingState:false
+            desc: null,
+            loadingState: false
         };
-        this.goodsId =params.id;
+        this.goodsId = params.id;
         this.isEditor = !!this.goodsId;
 
     }
 
     componentDidMount() {
         this.searchCategory();
-        if(this.isEditor) {
+        if (this.isEditor) {
             this.fetchData();
         }
     };
 
-    fetchData(){
+    fetchData() {
         const {
-            categoryActions ,
+            categoryActions,
             form
         } = this.props;
-        categoryActions.getGoods(this.goodsId).then( data => {
-
-            this.setState({
-                categoryId:data.categoryId,
-                cover:data.cover,
-                desc:data.desc,
-                goodsName:data.goodsName,
-                limit:data.limit,
-                liveStart:data.liveStart,
-                liveEnd:data.liveEnd,
-                price:data.price,
-                stock:data.stock,
-                banners:data.banners
+        categoryActions.getGoods(this.goodsId)
+            .then(data => {
+                this.setState({
+                    categoryId: data.categoryId,
+                    cover: data.cover,
+                    desc: data.desc,
+                    goodsName: data.goodsName,
+                    limit: data.limit,
+                    liveStart: data.liveStart,
+                    liveEnd: data.liveEnd,
+                    price: data.price,
+                    stock: data.stock,
+                    banners: data.banners
+                });
             });
-        });
     }
 
     searchCategory = (keyword = null) => {
@@ -129,11 +118,13 @@ class AddGood extends PureComponent {
             validateFields
         } = this.props.form;
         validateFields((err, fields) => {
-            if (!err) this.save(fields);
+            if (!err) {
+                this.save(fields);
+            }
         });
     };
 
-    save( fields ){
+    save(fields) {
         const {
             categoryId,
             goodsName,
@@ -165,22 +156,22 @@ class AddGood extends PureComponent {
 
         let errMsg = null;
 
-        if(!cover) {
+        if (!cover) {
             errMsg = `请上传封面图片！`;
         }
 
-        if(!banners.length) {
+        if (!banners.length) {
             errMsg = `请上传banner图片！`;
         }
 
-        if(!desc) {
+        if (!desc) {
             errMsg = `请上传商品详情！`;
         }
 
-        if(errMsg) return message.error(errMsg);
+        if (errMsg) return message.error(errMsg);
 
         this.setState({
-            loadingState:true
+            loadingState: true
         });
 
         const {
@@ -188,13 +179,29 @@ class AddGood extends PureComponent {
             history
         } = this.props;
 
-        categoryActions.addGoods(params).then(() => {
-            history.push('/home/mall/manage')
-        }).finally(()=>{
-            this.setState({
-                loadingState:false
+        if(this.isEditor) {
+            categoryActions.updateGoods(this.goodsId,params).then(data=>{
+                message.success(`更新成功!`);
+                history.push('/home/mall/manage');
+            }).catch(()=>{
+                message.error(`更新失败!`);
+            }).finally(()=>{
+                this.setState({
+                    loadingState: false
+                });
+            })
+        }
+        else {
+            categoryActions.addGoods(params).then(() => {
+                history.push('/home/mall/manage');
+            }).catch(()=>{
+                message.error(`保存失败!`);
+            }).finally(() => {
+                this.setState({
+                    loadingState: false
+                });
             });
-        })
+        }
     }
 
     disabledStartDate = (startValue) => {
@@ -221,14 +228,14 @@ class AddGood extends PureComponent {
 
     onStartChange = (value) => {
         this.setState({
-            liveStart:value
-        })
+            liveStart: value
+        });
     };
 
     onEndChange = (value) => {
         this.setState({
-            liveEnd:value
-        })
+            liveEnd: value
+        });
     };
 
     uploadCoverSuccess = url => {
@@ -249,11 +256,9 @@ class AddGood extends PureComponent {
         });
     };
 
-    onEditorStateChange = editorState => {
+    onEditorStateChange = html => {
         this.setState({
-            desc: draftToHtml(
-                convertToRaw(editorState.getCurrentContent())
-            )
+            desc: html
         });
     };
 
@@ -274,16 +279,10 @@ class AddGood extends PureComponent {
 
     uploadBannerBefore = () => {
         const { banners } = this.state;
-        if(banners > 10) return false;
+        if (banners > 10) return false;
         this.setState({
             uploadingBanner: true
         });
-    };
-
-    getDefaultEditorState = str => {
-        if(!str)  return EditorState.createEmpty();
-        const contentBlocks = convertFromHTML(str);
-        return EditorState.createWithContent(ContentState.createFromBlockArray(contentBlocks));
     };
 
     render() {
@@ -298,7 +297,7 @@ class AddGood extends PureComponent {
             getFieldDecorator
         } = form;
 
-        const {
+        let {
             banners,
             searching,
             cover,
@@ -306,158 +305,183 @@ class AddGood extends PureComponent {
             liveEnd,
             uploadingCover,
             uploadingBanner,
-            loadingState
+            loadingState,
+            categoryId,
+            goodsName,
+            price,
+            stock,
+            limit
         } = this.state;
-        const categoryList = this.getCategoryList();
-        const inputStyle = {
-            width:350
-        };
 
-        const desc = this.getDefaultEditorState(state.desc);
+        const categoryList = this.getCategoryList();
+
+        const inputStyle = { width: `100%` };
 
         return (
             <Fragment>
                 <Breadcrumb routes={routes}/>
                 <Form className={styles.goods_form} onSubmit={this.handleSubmit}>
-                    <Form.Item label="分类名称">
-                        {getFieldDecorator(`categoryId`, {
-                            rules: [{
-                                required: true,
-                                message: '分类名称不能为空!'
-                            }]
-                        })(
-                            <Select
-                                showSearch={true}
-                                optionFilterProp="children"
-                                notFoundContent = {
-                                    searching ? (
-                                        <Icon type="loading"/>
-                                    ):`没有该分类`
-                                }
-                                onSearch={this.fetchCategory}
-                                style={inputStyle}
-                                placeholder="请选择或输入分类名称"
-                            >
-                                {categoryList.map(option => {
-                                    const {
-                                        categoryId,
-                                        categoryName
-                                    } = option;
-                                    return (
-                                        <Option
-                                            key={categoryId}
-                                            value={categoryId}
-                                        >
-                                            {categoryName}
-                                        </Option>
-                                    );
-                                })}
-                            </Select>
-                        )}
-                    </Form.Item>
-                    <FormItem label="商品名称" hasFeedback>
-                        {getFieldDecorator('goodsName', {
-                            initialValue:state.goodsName,
-                            rules: [{
-                                required: true,
-                                message: '商品名称不能为空！'
-                            }]
-                        })(
-                            <Input
-                                style={inputStyle}
-                                placeholder="请输入商品名称"
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="商品价格">
-                        {getFieldDecorator('price', {
-                            initialValue:state.price,
-                            rules: [{
-                                required: true,
-                                message: '商品价格不能为空！'
-                            }],
-                        })(
-                            <InputNumber
-                                min={1}
-                                max={10000000000}
-                                style={inputStyle}
-                                placeholder="请输入价格（单位：分）"
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="库存数量">
-                        {getFieldDecorator('stock', {
-                            initialValue:state.stock,
-                            rules: [{
-                                required: true,
-                                message: '商品库存不能为空！'
-                            }],
-                        })(
-                            <InputNumber
-                                min={1}
-                                max={10000000000}
-                                style={inputStyle}
-                                placeholder="请输入库存"
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="上架时间">
-                        {getFieldDecorator('liveStart', {
-                            initialValue:moment(state.liveStart),
-                            rules: [{
-                                required: true,
-                                message: '开始时间不能为空！'
-                            }],
-                        })(
-                            <DatePicker
-                                locale={enZh}
-                                showTime={true}
-                                style={inputStyle}
-                                format="YYYY-MM-DD HH:mm:ss"
-                                setFieldsValue={liveStart}
-                                placeholder="开始日期"
-                                onChange={this.onStartChange}
-                                disabledDate={this.disabledStartDate}
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="下架时间">
-                        {getFieldDecorator('liveEnd', {
-                            initialValue:moment(state.liveEnd),
-                            rules: [{
-                                required: true,
-                                message: '截止时间不能为空！'
-                            }],
-                        })(
-                            <DatePicker
-                                showTime={true}
-                                locale={enZh}
-                                style={inputStyle}
-                                format="YYYY-MM-DD HH:mm:ss"
-                                setFieldsValue={liveEnd}
-                                placeholder="截止日期"
-                                onChange={this.onEndChange}
-                                disabledDate={this.disabledEndDate}
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="商品排序">
-                        {getFieldDecorator('limit', {
-                            initialValue:state.limit,
-                            rules: [{
-                                required: true,
-                                message: '排序不能为空！'
-                            }],
-                        })(
-                            <InputNumber
-                                min={1}
-                                max={10000000000}
-                                style={inputStyle}
-                                placeholder="请输入排序"
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem label="封面图片" extra="(最多上传1张)">
+                    <Row gutter={36}>
+                        <Col span={12}>
+                            <Form.Item label="分类名称">
+                                {getFieldDecorator(`categoryId`, {
+                                    initialValue: categoryId,
+                                    rules: [{
+                                        required: true,
+                                        message: '分类名称不能为空!'
+                                    }]
+                                })(
+                                    <Select
+                                        showSearch={true}
+                                        optionFilterProp="children"
+                                        notFoundContent={
+                                            searching ? (
+                                                <Icon type="loading"/>
+                                            ) : `没有该分类`
+                                        }
+                                        onSearch={this.fetchCategory}
+                                        style={inputStyle}
+                                        placeholder="请选择或输入分类名称"
+                                    >
+                                        {categoryList.map(option => {
+                                            const {
+                                                categoryId,
+                                                categoryName
+                                            } = option;
+                                            return (
+                                                <Option
+                                                    key={categoryId}
+                                                    value={categoryId}
+                                                >
+                                                    {categoryName}
+                                                </Option>
+                                            );
+                                        })}
+                                    </Select>
+                                )}
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <FormItem label="商品名称" hasFeedback>
+                                {getFieldDecorator('goodsName', {
+                                    initialValue: goodsName,
+                                    rules: [{
+                                        required: true,
+                                        message: '商品名称不能为空！'
+                                    }]
+                                })(
+                                    <Input
+                                        style={inputStyle}
+                                        placeholder="请输入商品名称"
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+
+                        <Col span={12}>
+                            <FormItem label="商品价格">
+                                {getFieldDecorator('price', {
+                                    initialValue: price,
+                                    rules: [{
+                                        required: true,
+                                        message: '商品价格不能为空！'
+                                    }],
+                                })(
+                                    <InputNumber
+                                        min={1}
+                                        max={10000000000}
+                                        style={inputStyle}
+                                        placeholder="请输入价格（单位：分）"
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={12}>
+                            <FormItem label="库存数量">
+                                {getFieldDecorator('stock', {
+                                    initialValue: stock,
+                                    rules: [{
+                                        required: true,
+                                        message: '商品库存不能为空！'
+                                    }],
+                                })(
+                                    <InputNumber
+                                        min={1}
+                                        max={10000000000}
+                                        style={inputStyle}
+                                        placeholder="请输入库存"
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={12}>
+                            <FormItem label="上架时间">
+                                {getFieldDecorator('liveStart', {
+                                    initialValue: liveStart ?moment(liveStart):liveStart,
+                                    rules: [{
+                                        required: true,
+                                        message: '开始时间不能为空！'
+                                    }],
+                                })(
+                                    <DatePicker
+                                        locale={enZh}
+                                        showTime={true}
+                                        style={inputStyle}
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        setFieldsValue={liveStart}
+                                        placeholder="开始日期"
+                                        onChange={this.onStartChange}
+                                        disabledDate={this.disabledStartDate}
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={12}>
+                            <FormItem label="下架时间">
+                                {getFieldDecorator('liveEnd', {
+                                    initialValue:liveEnd? moment(liveEnd):liveEnd,
+                                    rules: [{
+                                        required: true,
+                                        message: '截止时间不能为空！'
+                                    }],
+                                })(
+                                    <DatePicker
+                                        showTime={true}
+                                        locale={enZh}
+                                        style={inputStyle}
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        setFieldsValue={liveEnd}
+                                        placeholder="截止日期"
+                                        onChange={this.onEndChange}
+                                        disabledDate={this.disabledEndDate}
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={12}>
+                            <FormItem label="商品排序">
+                                {getFieldDecorator('limit', {
+                                    initialValue: limit,
+                                    rules: [{
+                                        required: true,
+                                        message: '排序不能为空！'
+                                    }],
+                                })(
+                                    <InputNumber
+                                        min={1}
+                                        max={10000000000}
+                                        style={inputStyle}
+                                        placeholder="请输入排序"
+                                    />
+                                )}
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <FormItem
+                        label="封面图片"
+                        extra="(最多上传1张)"
+                        required={true}
+                    >
                         <BaseUpload
                             uploadBefore={this.coverUploadBefore}
                             uploadSuccess={this.uploadCoverSuccess}
@@ -467,7 +491,7 @@ class AddGood extends PureComponent {
                                     className={styles.coverImage}
                                     style={{ backgroundImage: `url(${cover})` }}
                                 />
-                            ):(
+                            ) : (
                                 <Fragment>
                                     <Icon type={uploadingCover ? 'loading' : 'plus'}/>
                                     <div className="ant-upload-text">
@@ -477,7 +501,11 @@ class AddGood extends PureComponent {
                             )}
                         </BaseUpload>
                     </FormItem>
-                    <FormItem label="商品图片" extra="(最多上传10张)">
+                    <FormItem
+                        label="商品图片"
+                        extra="(最多上传10张)"
+                        required={true}
+                    >
                         <div className={styles.upload_list}>
                             {banners.map(url => (
                                 <div
@@ -499,23 +527,23 @@ class AddGood extends PureComponent {
                             </BaseUpload>
                         </div>
                     </FormItem>
-                    <FormItem label="商品详情">
+                    <FormItem
+                        required={true}
+                        label="商品详情"
+                    >
                         <Editor
-                            localization={{ locale: 'zh' }}
-                            toolbarClassName="toolbar-class"
-                            onEditorStateChange={this.onEditorStateChange}
-                            editorClassName={styles.editor_content_class}
-                            wrapperClassName={styles.editor_wrapper_className}
-                            editorState={desc}
+                            htmlText={state.desc}
+                            onChange={this.onEditorStateChange}
                         />
                     </FormItem>
                     <FormItem>
                         <Button
                             loading={loadingState}
+                            style={{float:'right'}}
                             type="primary"
                             htmlType="submit"
                         >
-                            {`保存${loadingState?`中..`:``}`}
+                            {`保存${loadingState ? `中..` : ``}`}
                         </Button>
                     </FormItem>
                 </Form>
@@ -524,7 +552,6 @@ class AddGood extends PureComponent {
     }
 }
 
-const CurrentForm = Form.create()(AddGood);
 export default connect(['mallCategory'], {
     categoryActions
-})(CurrentForm);
+})(Form.create()(AddGood));

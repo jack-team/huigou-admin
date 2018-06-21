@@ -25,6 +25,7 @@ export default {
                     type:types.GET_LIST,
                     data:data
                 });
+                return data;
             })
         )
     },
@@ -84,6 +85,14 @@ export default {
         return dispatch => (
             $http.get(`/mall/goods/detail`,{
                 id:id
+            })
+        )
+    },
+    updateGoods( id , update) {
+        return dispatch => (
+            $http.post(`/mall/goods/update` ,{
+                goodsId:id,
+                update:update
             })
         )
     }

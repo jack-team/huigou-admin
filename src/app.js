@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { HashRouter } from 'react-router-dom';
+import { HashRouter , BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import { message } from 'antd';
@@ -23,9 +23,9 @@ import Container from './components/Container';
 const App = () => (
     <Provider store={store}>
         <Container>
-            <HashRouter>
+            <BrowserRouter basename="/admin/site">
                 {routes}
-            </HashRouter>
+            </BrowserRouter>
         </Container>
     </Provider>
 );
