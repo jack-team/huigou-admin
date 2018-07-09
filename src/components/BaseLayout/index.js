@@ -98,7 +98,9 @@ class Home extends PureComponent {
                 <Layout className={styles.com_content}>
                     <MenuNav/>
                     <Layout>
-                        <Layout.Content className={styles.center_content}>
+                        <Layout.Content
+                            className={styles.center_content}
+                        >
                             {this.props.children}
                         </Layout.Content>
                     </Layout>

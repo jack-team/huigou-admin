@@ -28,6 +28,10 @@ export default [
             {
                 name: '用户信息',
                 path: '/info'
+            },
+            {
+                name: '员工管理',
+                path: '/staff'
             }
         ]
     }

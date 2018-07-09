@@ -16,12 +16,12 @@ class Editor extends PureComponent {
 
     static propTypes = {
         htmlText: PropTypes.string,
-        onChange:PropTypes.func
+        onChange: PropTypes.func
     };
 
     static defaultProps = {
         htmlText: ``,
-        onChange:()=>{}
+        onChange: () => {}
     };
 
     componentDidMount() {
@@ -63,7 +63,7 @@ class Editor extends PureComponent {
         this.setHtmlText(htmlText);
     }
 
-    uploadImage(){
+    uploadImage() {
         const {
             editor
         } = this;
@@ -73,14 +73,14 @@ class Editor extends PureComponent {
         editor.customConfig.uploadFileName = `file`;
         editor.customConfig.uploadImgTimeout = 60 * 1000;
         editor.customConfig.uploadImgServer = Editor.uploadUrl;
-        editor.customConfig.uploadImgHeaders = { Authorization: Editor.authStr  };
+        editor.customConfig.uploadImgHeaders = { Authorization: Editor.authStr };
         editor.customConfig.uploadImgHooks = {
-            before:()=>{
+            before: () => {
                 loading(`图片上传中...`);
             },
-            success:uploadResult,
-            error:uploadResult,
-            timeout:uploadResult
+            success: uploadResult,
+            error: uploadResult,
+            timeout: uploadResult
         };
     }
 
@@ -88,7 +88,7 @@ class Editor extends PureComponent {
         this.editor.txt.html(text);
     };
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.editor && this.editor._offAllEvent();
     }
 

@@ -55,8 +55,8 @@ class Manage extends PureComponent {
                 className: styles.table_head
             })
         }, {
-            title: `添加时间`,
-            dataIndex: `createAt`,
+            title: `上次修改`,
+            dataIndex: `updateUser`,
             width: 180,
             className: styles.table_body,
             onHeaderCell: () => ({

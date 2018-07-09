@@ -21,7 +21,7 @@ const devServer = {
     inline: true,
     // 端口号
     port: util.port,
-    // historyApiFallback: true,
+    historyApiFallback: true,
     stats: {
         colors: true,
         cached: false,
@@ -45,7 +45,7 @@ baseConfig.plugins = baseConfig.plugins.concat([
         __DEV__: true
     }),
     new OpenBrowserPlugin({
-        url: `http://localhost:6868/admin/site`
+        url: `http://localhost:6868`
     })
 ]);
 

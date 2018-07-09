@@ -9,8 +9,8 @@ import LazyLoad from '../components/LazyLoad';
 
 const BaseLayout = LazyLoad(() => import('../components/BaseLayout'));
 
+//首页
 const Home = LazyLoad(() => import('../views/home.js'));
-
 
 //商城管理路由
 import mallRoutes from './mall';
@@ -19,7 +19,9 @@ import mallRoutes from './mall';
 import systemRoutes from './system';
 
 const Routes = props => {
-    const { path } = props.match;
+    const {
+        path
+    } = props.match;
     return (
         <Switch>
             <Route

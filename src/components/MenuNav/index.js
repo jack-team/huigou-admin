@@ -73,8 +73,32 @@ class MenuNav extends PureComponent {
         });
     }
 
+    getMenuKeys(subKey) {
+        const { menuList } = this;
+        const pathName = this.getPathName(this.props);
+        if (!!subKey) {
+            const { children = [] } = menuList.find(({ path }) => (
+                subKey === path
+            )) || {};
+
+            const { path } = children.find(({ path }) => (
+                pathName.includes(`${subKey}${path}`)
+            )) || {};
+
+            return [`${subKey}${path}`];
+        }
+        const { path } = menuList.find(menu => (
+            pathName.includes(menu.path)
+        )) || {};
+        return !!path ? [path] : [];
+    }
+
     renderBaseItem = (item, sub, rootPath = '') => {
-        const { icon, name, path } = item;
+        const {
+            icon,
+            name,
+            path
+        } = item;
         return (
             <Menu.Item
                 key={`${rootPath}${path}`}
@@ -115,33 +139,14 @@ class MenuNav extends PureComponent {
         );
     }
 
-    getMenuKeys(subKey) {
-        const { menuList } = this;
-        const pathName = this.getPathName(this.props);
-        if(!!subKey) {
-            const {
-                children = []
-            } = menuList.find(menu => {
-                return subKey === menu.path;
-            }) || {};
-            const {
-                path
-            } = children.find(menu => {
-                const fullPath = `${subKey}${menu.path}`;
-                return pathName.includes(fullPath);
-            }) || {};
-            return [`${subKey}${path}`]
-        }
-        const baseMatch = menuList.find(  menu => {
-            return pathName.includes(menu.path);
-        });
-        return !!baseMatch ? [baseMatch.path] : [];
-    }
-
     render() {
-        const { collapsed, isTrigger, openKeys } = this.state;
-        const menuKeys = this.getMenuKeys(openKeys[0]);
+        const {
+            collapsed,
+            isTrigger,
+            openKeys
+        } = this.state;
         const { history } = this.props;
+        const menuKeys = this.getMenuKeys(openKeys[0]);
         return (
             <Layout.Sider
                 trigger={null}
@@ -152,7 +157,9 @@ class MenuNav extends PureComponent {
                     onClick={this.toggle}
                     className={styles.com_trigger}
                 >
-                    <Icon type={`menu-${collapsed ? `un` : ``}fold`}/>
+                    <Icon
+                        type={`menu-${collapsed ? `un` : ``}fold`}
+                    />
                 </div>
                 <Menu
                     mode="inline"

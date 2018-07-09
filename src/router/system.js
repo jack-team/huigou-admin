@@ -8,6 +8,7 @@ import {
 
 import LazyLoad from '../components/LazyLoad';
 const Info = LazyLoad(() => import('../views/system/info.js'));
+const Staff = LazyLoad(()=>import('../views/system/staff.js'));
 
 export default props => {
     const { path } = props.match;
@@ -16,7 +17,13 @@ export default props => {
             <Route
                 path={`${path}/info`}
                 component={Info}
+                desc="修改当前用户昵称和头像页面"
                 exact
+            />
+            <Route
+                path={`${path}/staff`}
+                component={Staff}
+                desc="员工管理"
             />
         </Fragment>
     );
