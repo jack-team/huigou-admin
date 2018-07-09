@@ -32,7 +32,7 @@ export default Promise => (
         life = true;
 
         state = {
-            Component: Loading
+            Component: null
         };
 
         componentWillMount() {
