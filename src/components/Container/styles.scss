@@ -10,12 +10,15 @@
     justify-content: center;
     align-items: center;
     .loading_center {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         border-radius: 6px;
         background-color: #fff;
-        line-height: 100px;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     .loading_icon {
         width: auto;
@@ -25,5 +28,11 @@
 
     &.hide {
         display: none;
+    }
+
+    .loading_text {
+        color: #666;
+        margin-top: 12px;
+        font-size: 14px;
     }
 }

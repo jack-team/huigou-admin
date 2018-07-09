@@ -25,15 +25,19 @@ class LoadingState extends PureComponent {
     constructor() {
         super();
         this.state = {
-            show: false
+            show: false,
+            created:false,
+            text:`加载中..`
         };
     }
 
     componentWillMount() {
 
-        window.loading = () => {
+        window.loading = text => {
             this.setState({
-                show: true
+                show: true,
+                created:true,
+                text:text || `加载中..`
             });
         };
 
@@ -47,7 +51,12 @@ class LoadingState extends PureComponent {
     }
 
     render() {
-        const { show } = this.state;
+        const {
+            show,
+            text,
+            created
+        } = this.state;
+        if(!created) return null;
         return (
             <div className={className(
                 styles.window_loading,
@@ -57,6 +66,9 @@ class LoadingState extends PureComponent {
                     <Spin
                         indicator={antIcon}
                     />
+                    <div className={styles.loading_text}>
+                        {text}
+                    </div>
                 </div>
             </div>
         );

@@ -67,9 +67,21 @@ class Editor extends PureComponent {
         const {
             editor
         } = this;
+        const uploadResult = () => {
+            loadingClose();
+        };
         editor.customConfig.uploadFileName = `file`;
+        editor.customConfig.uploadImgTimeout = 60 * 1000;
         editor.customConfig.uploadImgServer = Editor.uploadUrl;
         editor.customConfig.uploadImgHeaders = { Authorization: Editor.authStr  };
+        editor.customConfig.uploadImgHooks = {
+            before:()=>{
+                loading(`图片上传中...`);
+            },
+            success:uploadResult,
+            error:uploadResult,
+            timeout:uploadResult
+        };
     }
 
     setHtmlText = text => {

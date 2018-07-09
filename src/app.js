@@ -1,9 +1,21 @@
 import React from 'react';
-import { render } from 'react-dom';
-import { HashRouter , BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
 
-import { message } from 'antd';
+import {
+    render
+} from 'react-dom';
+
+import {
+    HashRouter ,
+    BrowserRouter
+} from 'react-router-dom';
+
+import {
+    Provider
+} from 'react-redux';
+
+import {
+    message
+} from 'antd';
 
 import './common/common';
 
@@ -23,7 +35,7 @@ import Container from './components/Container';
 const App = () => (
     <Provider store={store}>
         <Container>
-            <BrowserRouter basename="/admin/site">
+            <BrowserRouter basename="/site">
                 {routes}
             </BrowserRouter>
         </Container>

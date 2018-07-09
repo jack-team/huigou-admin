@@ -19,13 +19,14 @@ const routes = [{
 
 import goodsActions from './../../state/action/mall/goods';
 
-class Manage extends PureComponent{
+class Manage extends PureComponent {
 
-    constructor(){
+    constructor() {
         super();
         this.columns = [{
             title: `排序`,
             dataIndex: `limit`,
+            width: 80,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
@@ -33,54 +34,37 @@ class Manage extends PureComponent{
         }, {
             title: `商品名称`,
             dataIndex: `goodsName`,
-            width:200,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
             })
-        },{
+        }, {
             title: `库存`,
             dataIndex: `stock`,
-            width:150,
+            width: 150,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
             })
-        },{
-            title: `上架时间`,
-            dataIndex: `liveStart`,
-            width: 190,
-            className: styles.table_body,
-            onHeaderCell: () => ({
-                className: styles.table_head
-            })
-        },{
-            title: `下架时间`,
-            dataIndex: `liveEnd`,
-            width: 190,
-            className: styles.table_body,
-            onHeaderCell: () => ({
-                className: styles.table_head
-            })
-        },{
+        }, {
             title: `更新时间`,
             dataIndex: `updateAt`,
-            width: 190,
+            width: 180,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
             })
-        },{
+        }, {
             title: `添加时间`,
             dataIndex: `createAt`,
-            width: 190,
+            width: 180,
             className: styles.table_body,
             onHeaderCell: () => ({
                 className: styles.table_head
             })
         }, {
             title: `操作`,
-            width: 160,
+            width: 200,
             key: 'action',
             className: styles.table_body,
             render: this.renderTableAction,
@@ -89,58 +73,126 @@ class Manage extends PureComponent{
             })
         }];
         this.state = {
-            tableLoading:true
-        }
+            tableLoading: true
+        };
     }
 
-    openEditor( item ){
+    openEditor(item) {
         const { goodsId } = item;
         const { history } = this.props;
         history.push(`/home/mall/manage/${goodsId}`);
     }
 
+    upOrDown(item) {
+        const {
+            mallGoods,
+            goodsActions
+        } = this.props;
+
+        const {
+            goods
+        } = mallGoods;
+
+        const {
+            page
+        } = goods;
+
+        const {
+            status
+        } = item;
+
+        const upText = status === 1 ? `上架` : `下架`;
+
+        loading(`${upText}中..`);
+        goodsActions.upOrDown(item.goodsId, page)
+            .finally(() => {
+                loadingClose();
+            });
+    }
+
+    delete = item => {
+        const {
+            mallGoods,
+            goodsActions
+        } = this.props;
+        const {
+            goods
+        } = mallGoods;
+        const {
+            goodsId
+        } = item;
+        const {
+            page
+        } = goods;
+        loading(`删除中...`);
+        goodsActions.deleteGoods(goodsId,page).finally(()=>{
+            loadingClose();
+        });
+    };
+
     renderTableAction = item => {
+        const {
+            status
+        } = item;
+
+        const upText = status === 1 ? `上架` : `下架`;
         return (
             <Fragment>
-                <a className={styles.action_btn} onClick={() =>this.openEditor(item)}>
+
+                <Popconfirm
+                    title={`确定要${upText}吗？`}
+                    okText={`${upText}`}
+                    cancelText="取消"
+                    onConfirm={() => this.upOrDown(item)}
+                >
+                    <a className={styles.action_btn}>
+                        {upText}
+                    </a>
+                </Popconfirm>
+                <Divider type="vertical"/>
+                <a className={styles.action_btn}
+                    onClick={() => this.openEditor(item)}>
                     编辑
                 </a>
-                <Divider type="vertical" />
+                <Divider type="vertical"/>
                 <Popconfirm
                     title="确定要删除吗？"
                     okText="确定"
                     cancelText="取消"
                     onConfirm={() => this.delete(item)}
                 >
-                    <a className={styles.action_btn}>删除</a>
+                    <a className={styles.action_btn}>
+                        删除
+                    </a>
                 </Popconfirm>
             </Fragment>
         );
     };
 
-    componentDidMount(){
+    componentDidMount() {
         this.getList(1);
     }
 
-    getList( page , filters = {} ) {
+    getList(page, filters = {}) {
         const { goodsActions } = this.props;
         this.setState({
-            tableLoading:true
+            tableLoading: true
         });
-        goodsActions.getGoodsList(page,filters).finally(()=>{
-            this.setState({
-                tableLoading:false
-            })
-        })
+        goodsActions.getGoodsList(page, filters)
+            .finally(() => {
+                this.setState({
+                    tableLoading: false
+                });
+            });
     }
 
-    tableChange(){
+    tableChange() {
 
     }
 
-    render(){
+    render() {
         const {
-            history ,
+            history,
             mallGoods
         } = this.props;
 
@@ -170,8 +222,8 @@ class Manage extends PureComponent{
 
                         </Form.Item>
                     </Form>
-                    <Button type="primary" onClick={()=>{
-                        history.push('/home/mall/manage/add')
+                    <Button type="primary" onClick={() => {
+                        history.push('/home/mall/manage/add');
                     }}>
                         添加商品
                     </Button>
@@ -192,10 +244,10 @@ class Manage extends PureComponent{
                     onChange={this.tableChange}
                 />
             </div>
-        )
+        );
     }
 }
 
-export default connect([`mallGoods`],{
-    goodsActions:goodsActions
+export default connect([`mallGoods`], {
+    goodsActions: goodsActions
 })(Manage);

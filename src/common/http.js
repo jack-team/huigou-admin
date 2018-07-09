@@ -3,7 +3,7 @@ import axios from 'axios';
 const token = 'CE3CA381E7675B4F61D6E316BA156131';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:6868/admin',
+    baseURL: '',
     timeout: 1000 * 10
 });
 

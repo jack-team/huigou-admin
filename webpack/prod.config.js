@@ -36,15 +36,33 @@ const prodConfig = {
         new AssetsPlugin({
             filename: `asset.json`,
             processOutput: function (assets) {
-                const {common, app} = assets;
-                let css = [common.css],
-                    js = [common.js];
+                const {
+                    common,
+                    app
+                } = assets;
+
+                let css = [],
+                    js = [];
+
+                const commonCss = common.css,
+                    commonJs = common.js;
+
+                if(!!commonCss) {
+                    css.push(commonCss);
+                }
+
+                if(!!commonJs) {
+                    js.push(commonJs)
+                }
+
                 if (!!app.css) {
                     css.push(app.css)
                 }
+
                 if (!!app.js) {
                     js.push(app.js);
                 }
+
                 const assetsMap = {css: css, js: js};
                 return JSON.stringify(assetsMap);
             }

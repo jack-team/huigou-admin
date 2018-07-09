@@ -45,7 +45,7 @@ baseConfig.plugins = baseConfig.plugins.concat([
         __DEV__: true
     }),
     new OpenBrowserPlugin({
-        url: `http://localhost:6868/admin`
+        url: `http://localhost:6868/admin/site`
     })
 ]);
 

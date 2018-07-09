@@ -1,7 +1,26 @@
 import React, { PureComponent } from 'react';
 
+import styles from './styles.scss';
+
+import {
+    Spin,
+    Icon
+} from 'antd';
+
+const antIcon = (
+    <Icon
+        type="loading"
+        className={styles.loading_icon}
+        spin
+    />
+);
+
 const Loading = props => (
-    <div>loading...</div>
+    <div className={styles.load_page}>
+        <Spin
+            indicator={antIcon}
+        />
+    </div>
 );
 
 //高阶组件

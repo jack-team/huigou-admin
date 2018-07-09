@@ -6,6 +6,10 @@ import { Link } from 'react-router-dom';
 import styles from './addGood.scss';
 import Breadcrumb from './../../components/Breadcrumb';
 
+import {
+    Prompt
+} from 'react-router-dom';
+
 import moment from 'moment';
 
 import {
@@ -29,6 +33,7 @@ import connect from './../../common/connect';
 import BaseUpload from './../../components/Upload';
 import enZh from 'antd/lib/date-picker/locale/zh_CN';
 
+import goodsActions from './../../state/action/mall/goods';
 import categoryActions from './../../state/action/mall/category';
 
 const routes = [{
@@ -62,7 +67,9 @@ class AddGood extends PureComponent {
             liveEnd: null,
             //富文本
             desc: null,
-            loadingState: false
+            loadingState: false,
+            notFound:false,
+            isSaveSuccess:false
         };
         this.goodsId = params.id;
         this.isEditor = !!this.goodsId;
@@ -78,24 +85,32 @@ class AddGood extends PureComponent {
 
     fetchData() {
         const {
-            categoryActions,
+            goodsActions,
             form
         } = this.props;
-        categoryActions.getGoods(this.goodsId)
-            .then(data => {
-                this.setState({
-                    categoryId: data.categoryId,
-                    cover: data.cover,
-                    desc: data.desc,
-                    goodsName: data.goodsName,
-                    limit: data.limit,
-                    liveStart: data.liveStart,
-                    liveEnd: data.liveEnd,
-                    price: data.price,
-                    stock: data.stock,
-                    banners: data.banners
-                });
+        loading();
+        goodsActions.getGoods(this.goodsId).then(data => {
+            this.setState({
+                categoryId: data.categoryId,
+                cover: data.cover,
+                desc: data.desc,
+                goodsName: data.goodsName,
+                limit: data.limit,
+                liveStart: data.liveStart,
+                liveEnd: data.liveEnd,
+                price: data.price,
+                stock: data.stock,
+                banners: data.banners
             });
+        }).catch((err)=>{
+            if(err.code ===404) {
+                this.setState({
+                    notFound:true
+                });
+            }
+        }).finally(()=>{
+            loadingClose();
+        });
     }
 
     searchCategory = (keyword = null) => {
@@ -175,16 +190,20 @@ class AddGood extends PureComponent {
         });
 
         const {
-            categoryActions,
+            goodsActions,
             history
         } = this.props;
 
         if(this.isEditor) {
-            categoryActions.updateGoods(this.goodsId,params).then(data=>{
+            goodsActions.updateGoods(this.goodsId,params).then(data=>{
                 message.success(`更新成功!`);
-                history.push('/home/mall/manage');
-            }).catch(()=>{
-                message.error(`更新失败!`);
+                this.setState({
+                    isSaveSuccess:true
+                },()=>{
+                    history.replace('/home/mall/manage');
+                })
+            }).catch((err)=>{
+                message.error(err.message);
             }).finally(()=>{
                 this.setState({
                     loadingState: false
@@ -192,8 +211,12 @@ class AddGood extends PureComponent {
             })
         }
         else {
-            categoryActions.addGoods(params).then(() => {
-                history.push('/home/mall/manage');
+            goodsActions.addGoods(params).then(() => {
+                this.setState({
+                    isSaveSuccess:true
+                },()=>{
+                    history.replace('/home/mall/manage');
+                });
             }).catch(()=>{
                 message.error(`保存失败!`);
             }).finally(() => {
@@ -310,16 +333,31 @@ class AddGood extends PureComponent {
             goodsName,
             price,
             stock,
-            limit
+            limit,
+            notFound,
+            isSaveSuccess
         } = this.state;
 
         const categoryList = this.getCategoryList();
 
         const inputStyle = { width: `100%` };
 
+        if(notFound) {
+            return (
+                <div className={styles.not_found_page}>
+                    <i className={styles.not_found_icon} />
+                    <p>该商品不存在</p>
+                </div>
+            )
+        }
+
         return (
             <Fragment>
                 <Breadcrumb routes={routes}/>
+                <Prompt
+                    message="确定要离开？"
+                    when={!isSaveSuccess}
+                />
                 <Form className={styles.goods_form} onSubmit={this.handleSubmit}>
                     <Row gutter={36}>
                         <Col span={12}>
@@ -553,5 +591,6 @@ class AddGood extends PureComponent {
 }
 
 export default connect(['mallCategory'], {
+    goodsActions,
     categoryActions
 })(Form.create()(AddGood));
