@@ -77,7 +77,7 @@ const prodConfig = {
     ]
 };
 
-baseConfig.output.publicPath = "/static/";
+baseConfig.output.publicPath = "/static/site/dist";
 
 baseConfig.plugins = prodConfig.plugins.concat(baseConfig.plugins);
 
