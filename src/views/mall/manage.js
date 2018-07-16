@@ -219,14 +219,14 @@ class Manage extends PureComponent {
             });
     }
 
-    tableChange({current}) {
+    tableChange=({current})=> {
         const {
             searchForm
         } = this.state;
         this.getList(current,{
             ...searchForm
         })
-    }
+    };
 
     formChange = (filed , value ) => {
         const {
