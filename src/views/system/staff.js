@@ -3,10 +3,14 @@ import React, {
     Fragment 
 } from 'react';
 
+import styles from './staff.scss';
+
 class StaffMange extends PureComponent{
     render(){
         return (
-            <div>开发中...</div>
+            <div>
+
+            </div>
         )
     }
 }

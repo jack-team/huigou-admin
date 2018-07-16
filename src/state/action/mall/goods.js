@@ -2,7 +2,7 @@ import types from './../../const/mall/goods';
 
 export default {
     getGoodsList( page , filters ){
-        const pageSize = 30;
+        const pageSize = 10;
 
         return dispatch => (
             $http.get(`/mall/goods/list`,{

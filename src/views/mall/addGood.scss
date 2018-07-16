@@ -48,13 +48,24 @@
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+    position: relative;
+}
+
+.delete_image {
+    position: absolute;
+    font-size: 20px;
+    right: -8px;
+    top:-8px;
+    line-height: 20px;
+    color: #f40;
 }
 
 .item_image {
     width: 102px;
     height: 102px;
     border-radius: 4px;
-    margin-right: 10px;
+    margin-right: 20px;
+    margin-bottom: 10px;
     border: 1px dashed #d9d9d9;
     cursor: pointer;
     &:hover {
@@ -64,6 +75,7 @@
 
 .upload_list {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .editor_wrapper_className {

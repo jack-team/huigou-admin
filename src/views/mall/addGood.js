@@ -38,7 +38,7 @@ import categoryActions from './../../state/action/mall/category';
 
 const routes = [{
     path: '/home/mall/manage',
-    breadcrumbName: '商品分类'
+    breadcrumbName: '商品管理'
 }, {
     path: '',
     breadcrumbName: '添加商品'
@@ -302,11 +302,21 @@ class AddGood extends PureComponent {
 
     uploadBannerBefore = () => {
         const { banners } = this.state;
-        if (banners > 10) return false;
+        if (banners >= 20) return false;
         this.setState({
             uploadingBanner: true
         });
     };
+
+    deleteItemImage(i){
+        const {
+            banners
+        } = this.state;
+        banners.splice(i,1);
+        this.setState({
+            banners:[].concat(banners)
+        });
+    }
 
     render() {
         const {
@@ -541,16 +551,23 @@ class AddGood extends PureComponent {
                     </FormItem>
                     <FormItem
                         label="商品图片"
-                        extra="(最多上传10张)"
+                        extra="(最多上传20张)"
                         required={true}
                     >
                         <div className={styles.upload_list}>
-                            {banners.map(url => (
+                            {banners.map((url,i) => (
                                 <div
                                     key={url}
                                     className={styles.item_image}
                                     style={{ backgroundImage: `url(${url})` }}
-                                />
+                                >
+                                    <div
+                                        className={styles.delete_image}
+                                        onClick={()=>this.deleteItemImage(i)}
+                                    >
+                                        <Icon type="close-circle" />
+                                    </div>
+                                </div>
                             ))}
                             <BaseUpload
                                 uploadBefore={this.uploadBannerBefore}
