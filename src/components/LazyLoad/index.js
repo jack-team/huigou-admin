@@ -15,11 +15,9 @@ const antIcon = (
     />
 );
 
-const Loading = props => (
+const Loading = () => (
     <div className={styles.load_page}>
-        <Spin
-            indicator={antIcon}
-        />
+        <Spin indicator={antIcon}/>
     </div>
 );
 
@@ -43,23 +41,25 @@ export default Promise => (
             this.life = false;
         }
 
-        load() {
-            this.Promise()
-                .then(comp => {
-                    return comp.default ? comp.default : comp;
-                })
-                .then(comp => {
-                    if (this.life) {
-                        this.setState({
-                            Component: comp
-                        });
-                    }
+        async load() {
+            const result = await this.Promise();
+            const Component = result.default ? result.default : result;
+            if (this.life) {
+                this.setState({
+                    Component
                 });
+            }
         }
 
         render() {
-            const { Component } = this.state;
-            return <Component {...this.props}/>;
+            const {
+                Component
+            } = this.state;
+            return (
+                <Component
+                    {...this.props}
+                />
+            );
         }
     }
 )
